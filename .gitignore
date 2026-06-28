@@ -1,0 +1,25 @@
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+
+# --- node / common tooling (in case adapters or examples add any) ---
+node_modules/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# --- bootstrap installer scratch (temp files written during substitution) ---
+*.keel.tmp.*
+
+# --- Keel-managed state in a CONSUMING project (kept out of the framework repo) ---
+# init.sh writes these into a target project, not here; ignored defensively.
+.keel/snapshots/
+
+# --- env / secrets (never commit) ---
+.env
+.env.*
+!.env.example
