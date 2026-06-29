@@ -55,15 +55,28 @@ round(k):
       - backward-compat / every call site
       - cross-artifact consistency + every requirement → a task
       - docs & memory currency / front-door pointers
-  barrier-join, then COLLAPSE CONSERVATIVELY:
-      CLEAN  iff  every worker returned clean
-      FAIL   if   any worker found anything  (union all findings)
+  barrier-join, then COLLAPSE by SEVERITY (the Orchestrator owns this call):
+      each finding is BLOCKER | MAJOR | MINOR.
+      FAIL   if any worker found a BLOCKER/MAJOR (something that *needs* changing)
+             → fix single-writer, reset the streak.
+      CLEAN  if no blocker/major remains. MINOR nits are *dispositioned* by the
+             Orchestrator (accept / defer to BACKLOG / fold in) and do NOT, by
+             themselves, reset the streak.
   → the Orchestrator records ONE verdict for round k.
 ```
 
-Each worker must re-verify citations against **live code this round** and state its lens
-coverage — a bare "looks good" is not a round (`§1`, `§6`). Breadth within a round is *not*
-depth over time: the floor of 3 and the two-*consecutive*-clean exit still apply across rounds.
+Each worker must re-verify citations against **live code this round**, **tag each finding's
+severity**, and state its lens coverage — a bare "looks good" is not a round (`§1`, `§6`).
+Breadth within a round is *not* depth over time: the floor of 3 and the two-*consecutive*-clean
+exit still apply across rounds.
+
+> **Convergence pitfall (learned in the field).** Do **not** define CLEAN as "zero findings
+> of any kind" — adversarial reviewers *always* surface a minor nit, so the streak never
+> reaches two-consecutive and the gate loops forever (burning tokens). CLEAN = **no
+> blocker/major left**; the Orchestrator dispositions minors and **owns the final verdict**.
+> If the blocker/major count is trending to zero but minors keep the streak from closing,
+> that is the Orchestrator's signal to disposition the minors and call convergence — not to
+> spin another round.
 
 ### Preserving the consecutive-clean streak
 
