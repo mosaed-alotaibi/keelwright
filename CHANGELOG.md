@@ -4,6 +4,23 @@ All notable changes to Keel are recorded here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- **`core/03-REVIEW-GATES.md`** — made the review-gate engine safe to run as a
+  *parallel swarm* without weakening the cadence:
+  - New **"Breadth within a round, depth across rounds"** — parallelism is K
+    reviewers *within* one round (distinct lenses, one frozen snapshot; the round
+    is CLEAN only if every reviewer is clean), while the clean-streak still counts
+    *serialized* rounds. Collapsing N rounds into one big fan-out is called out as
+    a cadence violation, so the floor + two-consecutive-clean exit hold bit-for-bit.
+  - New **"The findings ledger"** — a shared `open · fixed · wontfix` ledger handed
+    to each fresh reviewer ("report only NEW findings"), the missing precondition
+    that stops a parallel, no-memory review loop from oscillating and never
+    converging.
+  - Quick-reference updated with the `PARALLEL` and `LEDGER` lines.
+
 ## [0.1.0] — Initial release
 
 The first portable, generalized cut of the framework.

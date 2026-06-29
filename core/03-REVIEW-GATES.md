@@ -168,7 +168,7 @@ from multiple angles," not "clean from the same angle twice."
 
 ---
 
-## 6. Fresh-context independence
+## 6. Fresh-context independence (and parallel reviewers)
 
 The heavy gate's rounds carry the most weight when each is run by an
 **independent reviewer in a fresh context** — a separate agent session, a second
@@ -191,6 +191,48 @@ You can **fan out** multiple fresh reviewers in parallel for read-only audit
 rounds (no shared mutable state), then have a single owner apply the fixes
 between rounds. (Writing fixes is single-writer; see
 [`02-RITUALS.md`](02-RITUALS.md) — Ritual 13, Parallel-work synchronization.)
+That fan-out is **breadth, not a shortcut past the cadence** — the next two
+subsections make the distinction precise and add the one piece a parallel loop
+needs to actually converge.
+
+### Breadth within a round, depth across rounds
+
+Parallelism lives **inside** a round, never across the streak. Keep the two axes
+separate:
+
+- **Breadth (parallel).** Within one round, fan out **K reviewers at once**, each
+  pinned to a *distinct* lens (§5), all reading the **same frozen snapshot** — no
+  fixes land mid-round. The round's outcome is the **union** of what they find:
+  CLEAN only if *every* reviewer is clean; a single real finding by any reviewer
+  FAILs the whole round.
+- **Depth (serial).** The streak still counts **rounds**, and rounds stay
+  **serialized** — each new round reads the snapshot the previous round's fixes
+  produced, so "two *consecutive* clean" stays well-defined. The owner alone owns
+  the decision to stop; it is never delegated to a reviewer.
+
+So **do not collapse three rounds into one K×3-reviewer fan-out.** That buys
+breadth at the price of the cadence, and "consecutive" loses meaning. Run K
+reviewers *per* round, then the next round. Done this way the floor and the
+two-consecutive-clean exit hold bit-for-bit, and the bar only *rises*: a clean
+round now means K independent clean verdicts through K different lenses, not one
+reviewer's single look. Scale K to the artifact's leverage — a few for an
+ordinary gate, more at the completion seal.
+
+### The findings ledger
+
+A parallel, multi-round loop needs one shared artifact the bare cadence does not
+name: a **findings ledger**. Without it, fresh reviewers — who by design carry no
+memory of prior rounds — keep re-reporting issues already fixed or consciously
+declined, the streak never cleanly resets, and the loop can **oscillate and never
+converge**.
+
+Track every finding with a state — **open · fixed · wontfix** (a one-line reason
+for *wontfix*) — and have the single fixer update it between rounds. Hand each new
+reviewer the ledger as context: *"these are known — report only a NEW issue or a
+genuine regression of a fixed one."* A round is **CLEAN when it surfaces no new
+open finding**; a re-report of a `wontfix`, or of a `fixed` item that is still
+fixed, is not new and does not reset the streak. The ledger doubles as the
+round-by-round evidence §7 asks you to surface.
 
 ### Verify citations against live code
 
@@ -227,6 +269,10 @@ FLOOR      = min 3 rounds, always
 GROUNDWORK = the 1st round does NOT count toward exit (even if clean)
 EXIT       = floor met AND last two rounds both CLEAN (consecutive)
 NOT EXIT   = a single clean after a fail; two clean before the floor
+PARALLEL   = K reviewers WITHIN a round (distinct lenses, same snapshot);
+             rounds stay serial — never collapse N rounds into one fan-out
+LEDGER     = findings tracked open·fixed·wontfix; each reviewer reports only
+             NEW findings → the parallel loop converges instead of oscillating
 LIGHT GATE = 1 coherence pass per artifact, inline, by the author  → feeds →
 HEAVY GATE = full cadence, fresh-context reviewers, before any seal/reset
 LENSES     = correct·relevant·plausible·well-specified·well-formed
