@@ -62,6 +62,11 @@ Canonical ritual definitions: [`../../core/02-RITUALS.md`](../../core/02-RITUALS
 
 Always name the choice; do not silently default to inline.
 
+> Running a **gate itself** (or the execute phase) as a parallel **swarm** while keeping it
+> strictly gated — the Orchestrator/Worker split, the "one round = N reviewers → one
+> conservative verdict" collapse, race-free funnel writes, and Workflow-tool recipes — is in
+> [`rules/GATED-SWARM.md`](rules/GATED-SWARM.md). Fan out the *work*, never the *gate*.
+
 ---
 
 ## Layout
@@ -71,6 +76,7 @@ adapters/claude-code/
   README.md                       ← this file
   CLAUDE.md.tmpl                  ← project CLAUDE.md skeleton
   rules/RITUALS-IN-CLAUDE-CODE.md ← per-ritual CC playbook
+  rules/GATED-SWARM.md            ← run the gates as parallel fan-out without weakening them
   memory/MEMORY.md.tmpl           ← auto-memory index template
   memory/_SEED_MEMORIES.md        ← generalized seed memory bundle
   hooks/settings.snippet.json     ← hook config to merge
