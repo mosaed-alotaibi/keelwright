@@ -20,6 +20,30 @@ All notable changes to Keel are recorded here. Format loosely follows
   The agent challenges the owner (real opinions, pushback, never blind obedience) and
   itself (one bounded adversarial self-critique pass, then decide — no infinite
   judgment loop). Self-review (#6) turned adversarial and bounded.
+- **`adapters/claude-code/rules/GATED-SWARM.md`** — run Keel's gates and the execute
+  phase as a parallel **swarm** without weakening the cadence: the Orchestrator/Worker
+  split, "one round = N reviewers → one conservative verdict," race-free funnel/ID
+  writes, and Workflow-tool recipes. Pointers added from `CLAUDE.md.tmpl`, the adapter
+  `README`, and `RITUALS-IN-CLAUDE-CODE.md`. *Fan out the work, never the gate.*
+
+### Changed
+
+- **`core/03-REVIEW-GATES.md`** — made the review-gate engine safe to run as a
+  *parallel swarm* without weakening the cadence:
+  - New **"Breadth within a round, depth across rounds"** — parallelism is K
+    reviewers *within* one round (distinct lenses, one frozen snapshot; the round
+    is CLEAN only if every reviewer is clean), while the clean-streak still counts
+    *serialized* rounds. Collapsing N rounds into one big fan-out is called out as
+    a cadence violation, so the floor + two-consecutive-clean exit hold bit-for-bit.
+  - New **"The findings ledger"** — a shared `open · fixed · wontfix` ledger handed
+    to each fresh reviewer ("report only NEW findings"), the missing precondition
+    that stops a parallel, no-memory review loop from oscillating and never
+    converging.
+  - Quick-reference updated with the `PARALLEL` and `LEDGER` lines.
+- **`adapters/claude-code/hooks/`** — the Ritual-12 SessionEnd snapshot now writes to
+  `.harness/memory-snapshots/` (was `.keel/snapshots/`) and prunes to the newest 20;
+  the hook install recipe is now array-safe (concatenates the `PostToolUse`/`SessionEnd`
+  arrays instead of letting `jq *` replace them).
 
 ## [0.1.0] — Initial release
 
