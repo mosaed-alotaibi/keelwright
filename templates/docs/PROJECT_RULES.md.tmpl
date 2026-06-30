@@ -1,8 +1,8 @@
 # Project rules — {{PROJECT_NAME}}
 
-<!-- A THIN per-project rules file. It does NOT restate the Keel rituals — it -->
+<!-- A THIN per-project rules file. It does NOT restate the Keelwright rituals — it -->
 <!-- ADOPTS them by reference, then adds only what is specific to THIS project. -->
-<!-- Keeping the rituals in one canonical place (the installed Keel core) means -->
+<!-- Keeping the rituals in one canonical place (the installed Keelwright core) means -->
 <!-- they evolve once and every project inherits the change. -->
 
 > Long-lived rules that apply across every milestone, plan, and session.
@@ -11,19 +11,19 @@
 
 ---
 
-## The standing rituals (adopted from Keel)
+## The standing rituals (adopted from Keelwright)
 
-This project adopts the Keel lifecycle and review gates **by reference**. Do not
+This project adopts the Keelwright lifecycle and review gates **by reference**. Do not
 copy them here — read them at their canonical location so updates flow through:
 
 | Layer | Where it lives | What it covers |
 |---|---|---|
-| Tool-agnostic methodology | [`keel/core/02-RITUALS.md`]({{KEEL_CORE_PATH}}/02-RITUALS.md) | The lifecycle loop, the review gates, the pre-done confirmation ritual, verification doctrine, the per-session capture rituals |
-| Tool mapping (this project's agent) | [the adapter for your agent]({{KEEL_ADAPTER_PATH}}) | How the rituals map onto this project's concrete tooling (independent-reviewer mechanics, durable cross-session notes, hooks) |
+| Tool-agnostic methodology | [`keelwright/core/02-RITUALS.md`]({{KEELWRIGHT_CORE_PATH}}/02-RITUALS.md) | The lifecycle loop, the review gates, the pre-done confirmation ritual, verification doctrine, the per-session capture rituals |
+| Tool mapping (this project's agent) | [the adapter for your agent]({{KEELWRIGHT_ADAPTER_PATH}}) | How the rituals map onto this project's concrete tooling (independent-reviewer mechanics, durable cross-session notes, hooks) |
 
-<!-- Replace {{KEEL_CORE_PATH}} / {{KEEL_ADAPTER_PATH}} with the real installed -->
-<!-- paths, e.g. ../../keel/core and the adapter dir for YOUR agent under -->
-<!-- keel/adapters/<your-agent>/, or the vendored copy under this repo. -->
+<!-- Replace {{KEELWRIGHT_CORE_PATH}} / {{KEELWRIGHT_ADAPTER_PATH}} with the real installed -->
+<!-- paths, e.g. ../../keelwright/core and the adapter dir for YOUR agent under -->
+<!-- keelwright/adapters/<your-agent>/, or the vendored copy under this repo. -->
 
 **The rituals at a glance** (full text lives in `core/02-RITUALS.md`):
 
@@ -45,14 +45,14 @@ copy them here — read them at their canonical location so updates flow through
 16. Dependency-reality check — verify an unfamiliar / fast-moving / post-cutoff dependency against the installed package's source/types before designing on it; pin the version.
 
 <!-- Trim or extend this list to the rituals your project actually adopts. -->
-<!-- If you adopt all of Keel core, leave it as-is; if you drop some, say so here. -->
+<!-- If you adopt all of Keelwright core, leave it as-is; if you drop some, say so here. -->
 
 ---
 
 ## Project-specific conventions
 
 <!-- This is the ONLY part that is genuinely per-project. Put here the things -->
-<!-- Keel core cannot know: naming/brand rules, hub files that must serialize, -->
+<!-- Keelwright core cannot know: naming/brand rules, hub files that must serialize, -->
 <!-- environment specifics, locked owner decisions, stack-bound conventions. -->
 <!-- Each entry should be a durable rule, not a transient note. -->
 
@@ -81,7 +81,7 @@ _None yet — add the first project-specific convention here as it emerges._
 - **This file** (`docs/PROJECT_RULES.md`) — the per-project layer: the adoption
   pointer above + the project-specific conventions. Durable in the repo, survives
   context resets, applies to all future milestones.
-- **Keel core** (`core/02-RITUALS.md`) — the canonical, tool-agnostic ritual text.
+- **Keelwright core** (`core/02-RITUALS.md`) — the canonical, tool-agnostic ritual text.
   Update the rituals there; this file only references them.
 - **The tool adapter** (`adapters/<your-agent>/`) — maps the rituals onto the
   concrete agent/tooling, including any durable cross-session notes the agent keeps.

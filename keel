@@ -1,0 +1,272 @@
+#!/usr/bin/env bash
+#
+# keel — the Keelwright command-line tool.
+#
+# Keelwright is a methodology you adopt, not a daemon you run. This one command
+# bootstraps a project into it, the way `git init` bootstraps version control:
+# run `keel init` in a directory and it lays down the Keelwright doc funnel,
+# asking you (interactively) for the handful of facts it needs.
+#
+# Usage:
+#   keel init [dir]   Initialise a project as a Keelwright project (interactive).
+#   keel version      Print the Keelwright version.
+#   keel help         Show this help.
+#
+# Run `keel init --help` for the init flags (used for non-interactive / CI runs).
+
+set -euo pipefail
+
+# --- locate ourselves + the Keelwright root, following a symlink chain --------
+# So `ln -s /path/to/keelwright/keel /usr/local/bin/keel` works from anywhere.
+_self="$0"
+while [ -h "$_self" ]; do
+  _ls="$(ls -ld "$_self")"; _link="${_ls#*-> }"
+  case "$_link" in
+    /*) _self="$_link" ;;
+    *)  _self="$(dirname "$_self")/$_link" ;;
+  esac
+done
+KEELWRIGHT_ROOT="$(cd "$(dirname "$_self")" && pwd)"
+KEELWRIGHT_VERSION="$(sed -n '1p' "$KEELWRIGHT_ROOT/VERSION" 2>/dev/null | tr -d '[:space:]')"
+[ -n "$KEELWRIGHT_VERSION" ] || KEELWRIGHT_VERSION="0.0.0"
+
+# shellcheck source=bootstrap/lib/common.sh
+. "$KEELWRIGHT_ROOT/bootstrap/lib/common.sh"
+# shellcheck source=bootstrap/lib/install.sh
+. "$KEELWRIGHT_ROOT/bootstrap/lib/install.sh"
+
+# --- a small ship, for flavor ------------------------------------------------
+banner() {
+  printf '%s\n' "${_C_BLU}" >&2
+  cat >&2 <<'SHIP'
+      _  __         _              _      _     _
+     | |/ /___  ___| |_      ___ _(_)__ _| |_  | |_
+     | ' </ -_)/ -_) | \ \/\/ / '_| / _` | ' \ |  _|
+     |_|\_\___|\___|_|  \_/\_/|_| |_\__, |_||_| \__|
+                                    |___/
+SHIP
+  printf '%s' "${_C_RST}" >&2
+  dim "  Keelwright v${KEELWRIGHT_VERSION} — the methodology that makes \"are we done?\" answerable."
+}
+
+usage() {
+  cat >&2 <<EOF
+${_C_BLD}keel${_C_RST} — the Keelwright command-line tool (v${KEELWRIGHT_VERSION})
+
+${_C_BLD}USAGE${_C_RST}
+  keel init [dir]      Initialise a project as a Keelwright project (interactive).
+  keel version         Print the Keelwright version.
+  keel help            Show this help.
+
+${_C_BLD}keel init${_C_RST}
+  Run inside (or pointed at) the project you want to adopt Keelwright, the way
+  you'd run \`git init\`. With a terminal it asks a few questions; otherwise it
+  uses flags + smart defaults. It copies the doc funnel into <dir>/docs/, can
+  install the Claude Code adapter, writes a .keelwright/config marker, and never
+  overwrites an existing file unless you pass --force.
+
+  ${_C_BLD}flags${_C_RST} (all optional — prompts fill anything you omit):
+    --name "Project Name"   value for {{PROJECT_NAME}}   (default: dir basename)
+    --slug project-slug     value for {{PROJECT_SLUG}}   (default: slug of --name)
+    --owner "Name"          value for {{OWNER}}          (default: git user.name, else \$USER)
+    --stack "Tech, Tech"    value for {{STACK}}          (default: left as a placeholder)
+    --repo-url URL          value for {{REPO_URL}}       (default: git remote, else dir)
+    --with-cc-adapter       install the Claude Code adapter (CLAUDE.md, memory, hooks)
+    --no-cc-adapter         skip the adapter (the default)
+    --git                   run \`git init\` in <dir> if it is not already a repo
+    --no-git                never run \`git init\` (the default)
+    -y, --yes               non-interactive: accept all defaults, ask nothing
+    --force                 overwrite files that already exist
+    --dry-run               show what would happen; write nothing
+    -h, --help              this help
+
+${_C_BLD}EXAMPLES${_C_RST}
+  cd my-project && keel init               # interactive, in place
+  keel init ./my-project --with-cc-adapter # initialise a sibling dir, with the CC adapter
+  keel init . --yes --name "Acme API"      # scripted / CI, no prompts
+EOF
+}
+
+# --- interactive prompt helpers ----------------------------------------------
+# Interactive unless --yes; testable via KW_FORCE_INTERACTIVE=1 even off a TTY.
+is_interactive() {
+  [ "${ASSUME_YES:-0}" = "1" ] && return 1
+  [ "${KW_FORCE_INTERACTIVE:-0}" = "1" ] && return 0
+  [ -t 0 ]
+}
+
+# kw_ask <prompt> <default> — echo the answer (default on empty). Reads stdin.
+kw_ask() {
+  _q="$1"; _def="${2:-}"; _ans=""
+  if is_interactive; then
+    if [ -n "$_def" ]; then printf '%s%s%s [%s]: ' "$_C_BLD" "$_q" "$_C_RST" "$_def" >&2
+    else                    printf '%s%s%s: '       "$_C_BLD" "$_q" "$_C_RST"        >&2; fi
+    IFS= read -r _ans || _ans=""
+  fi
+  [ -n "$_ans" ] || _ans="$_def"
+  printf '%s' "$_ans"
+}
+
+# kw_ask_yn <prompt> <default:y|n> — return 0 for yes, 1 for no.
+kw_ask_yn() {
+  _q="$1"; _def="$2"; _ans=""
+  _hint="[y/N]"; [ "$_def" = "y" ] && _hint="[Y/n]"
+  if is_interactive; then
+    printf '%s%s%s %s: ' "$_C_BLD" "$_q" "$_C_RST" "$_hint" >&2
+    IFS= read -r _ans || _ans=""
+  fi
+  [ -n "$_ans" ] || _ans="$_def"
+  case "$_ans" in [Yy]*) return 0 ;; *) return 1 ;; esac
+}
+
+# --- keel init ---------------------------------------------------------------
+cmd_init() {
+  # defaults / flag holders (empty = "not supplied, resolve later")
+  local TARGET_ARG="" OPT_NAME="" OPT_SLUG="" OPT_OWNER="" OPT_STACK="" OPT_REPO=""
+  local OPT_CC="" OPT_GIT=""
+  ASSUME_YES=0; FORCE=0; DRY=0
+
+  while [ "$#" -gt 0 ]; do
+    case "$1" in
+      -h|--help) usage; exit 0 ;;
+      --name|--slug|--owner|--stack|--repo-url)
+        [ "$#" -ge 2 ] || die "$1 requires a value (try 'keel init --help')"
+        case "$1" in
+          --name) OPT_NAME="$2" ;; --slug) OPT_SLUG="$2" ;; --owner) OPT_OWNER="$2" ;;
+          --stack) OPT_STACK="$2" ;; --repo-url) OPT_REPO="$2" ;;
+        esac
+        shift 2 ;;
+      --with-cc-adapter) OPT_CC="1"; shift ;;
+      --no-cc-adapter)   OPT_CC="0"; shift ;;
+      --git)      OPT_GIT="1"; shift ;;
+      --no-git)   OPT_GIT="0"; shift ;;
+      -y|--yes)   ASSUME_YES=1; shift ;;
+      --force)    FORCE=1; shift ;;
+      --dry-run)  DRY=1; shift ;;
+      --) shift; break ;;
+      -*) die "unknown option: $1 (try 'keel init --help')" ;;
+      *)
+        if [ -z "$TARGET_ARG" ]; then TARGET_ARG="$1"; shift
+        else die "unexpected extra argument: $1 (try 'keel init --help')"; fi
+        ;;
+    esac
+  done
+  # A positional after `--` (the POSIX end-of-options marker, e.g.
+  # `keel init -- ./dir`) is still the target dir — capture it, then reject any
+  # extras for parity with the normal parse path above.
+  if [ -z "$TARGET_ARG" ] && [ "$#" -gt 0 ]; then TARGET_ARG="$1"; shift; fi
+  if [ "$#" -gt 0 ]; then die "unexpected extra argument: $1 (try 'keel init --help')"; fi
+
+  is_interactive && banner
+
+  # --- resolve the target directory (create it if missing, like `git init`) ---
+  local _dir="${TARGET_ARG:-.}"
+  if [ ! -d "$_dir" ]; then
+    if [ "$DRY" = "1" ]; then
+      ok "would create directory: $_dir"
+    else
+      mkdir -p -- "$_dir" || die "could not create target directory: $_dir"
+      ok "created directory: $_dir"
+    fi
+  fi
+  # `--` guards every operand so a target dir beginning with `-` (only reachable
+  # via the `--` end-of-options form) is treated as a path, not an option flag.
+  TARGET="$(cd -- "$_dir" 2>/dev/null && pwd || printf '%s' "$_dir")"
+
+  # Refuse to install onto the Keelwright source itself.
+  if [ "$TARGET" = "$KEELWRIGHT_ROOT" ]; then
+    die "that's the Keelwright source itself — run \`keel init\` in the project you want to adopt it."
+  fi
+  # Refuse a silent re-init.
+  if [ -f "$TARGET/.keelwright/config" ] && [ "$FORCE" != "1" ]; then
+    err "already a Keelwright project: $TARGET/.keelwright/config exists."
+    die "re-run with --force to re-initialise (existing files are still never overwritten without --force)."
+  fi
+
+  # --- resolve each config value: flag > prompt > smart default ---------------
+  local _def_name _def_slug _def_owner _def_repo
+  _def_name="$(basename -- "$TARGET")"
+  PROJECT_NAME="${OPT_NAME:-$(kw_ask "Project name" "$_def_name")}"
+
+  _def_slug="$(slugify "$PROJECT_NAME")"
+  PROJECT_SLUG="${OPT_SLUG:-$(kw_ask "Project slug (identifiers, urls)" "$_def_slug")}"
+
+  _def_owner="$(git -C "$TARGET" config user.name 2>/dev/null || true)"
+  [ -n "$_def_owner" ] || _def_owner="${USER:-unknown}"
+  OWNER="${OPT_OWNER:-$(kw_ask "Owner / maintainer" "$_def_owner")}"
+
+  # Stack: empty stays the literal {{STACK}} placeholder for the project to fill.
+  if [ -n "$OPT_STACK" ]; then STACK_VALUE="$OPT_STACK"
+  else
+    local _s; _s="$(kw_ask "Tech stack (optional, comma-separated)" "")"
+    if [ -n "$_s" ]; then STACK_VALUE="$_s"; else STACK_VALUE="{{STACK}}"; fi
+  fi
+
+  _def_repo="$(git -C "$TARGET" remote get-url origin 2>/dev/null || true)"
+  [ -n "$_def_repo" ] || _def_repo="$TARGET"
+  REPO_URL="${OPT_REPO:-$(kw_ask "Repo URL" "$_def_repo")}"
+
+  # Claude Code adapter. Off unless --with-cc-adapter or an interactive "yes".
+  # (Non-interactive runs never prompt, so they stay conservative by default.)
+  if   [ "$OPT_CC" = "1" ]; then WITH_CC=1
+  elif [ "$OPT_CC" = "0" ]; then WITH_CC=0
+  elif is_interactive && kw_ask_yn "Install the Claude Code adapter (CLAUDE.md + memory + hooks)?" "n"; then WITH_CC=1
+  else WITH_CC=0; fi
+  if [ "$WITH_CC" = "1" ]; then ADAPTER_LABEL="claude-code"; else ADAPTER_LABEL="none"; fi
+
+  # git init — only offered when not already inside a repo. Off unless --git or an
+  # interactive "yes"; --yes / CI never create a repo unprompted (least surprise).
+  local _is_repo=0
+  if git -C "$TARGET" rev-parse --is-inside-work-tree >/dev/null 2>&1; then _is_repo=1; fi
+  GIT_INIT=0
+  if [ "$_is_repo" = "0" ]; then
+    if   [ "$OPT_GIT" = "1" ]; then GIT_INIT=1
+    elif [ "$OPT_GIT" = "0" ]; then GIT_INIT=0
+    elif is_interactive && kw_ask_yn "Initialise a git repository here?" "y"; then GIT_INIT=1
+    fi
+  fi
+
+  DATE="$(keelwright_today)"
+
+  # --- confirm, then go -------------------------------------------------------
+  if is_interactive; then
+    printf '\n' >&2
+    log "about to initialise:"
+    dim "  target   $TARGET"
+    dim "  name     $PROJECT_NAME"
+    dim "  slug     $PROJECT_SLUG"
+    dim "  owner    $OWNER"
+    dim "  stack    $STACK_VALUE"
+    dim "  repo     $REPO_URL"
+    dim "  adapter  $ADAPTER_LABEL"
+    dim "  git init $([ "$GIT_INIT" = 1 ] && echo yes || echo no)"
+    [ "$FORCE" = "1" ] && warn "  force: existing files WILL be overwritten"
+    [ "$DRY" = "1" ]   && warn "  dry-run: nothing will be written"
+    printf '\n' >&2
+    if ! kw_ask_yn "Proceed?" "y"; then
+      warn "aborted — nothing was written."
+      exit 0
+    fi
+    printf '\n' >&2
+  fi
+
+  if [ "$GIT_INIT" = "1" ]; then
+    if [ "$DRY" = "1" ]; then ok "would run: git init $TARGET"
+    else git -C "$TARGET" init -q && ok "git repository initialised"; fi
+  fi
+
+  kw_run_install
+}
+
+# --- dispatch ----------------------------------------------------------------
+main() {
+  local _cmd="${1:-help}"
+  case "$_cmd" in
+    init)            shift; cmd_init "$@" ;;
+    version|--version|-v) printf 'Keelwright %s\n' "$KEELWRIGHT_VERSION" ;;
+    help|--help|-h|"") usage ;;
+    *) err "unknown command: $_cmd"; usage; exit 1 ;;
+  esac
+}
+
+main "$@"

@@ -1,23 +1,29 @@
-# Keel Adapter — Claude Code
+# Keelwright Adapter — Claude Code
 
-This adapter maps Keel's tool-agnostic methodology (`../../core/`) onto concrete Claude Code mechanics: subagents (the Agent tool), the Workflow tool, the Skill tool, auto-memory files + `MEMORY.md`, and hooks in `settings.json`.
+This adapter maps Keelwright's tool-agnostic methodology (`../../core/`) onto concrete Claude Code mechanics: subagents (the Agent tool), the Workflow tool, the Skill tool, auto-memory files + `MEMORY.md`, and hooks in `settings.json`.
 
-> Keel core is deliberately tool-agnostic. Wherever core says *"an independent reviewer in a fresh context"* or *"fan out parallel reviewers"*, this adapter tells you the literal Claude Code move.
+> Keelwright core is deliberately tool-agnostic. Wherever core says *"an independent reviewer in a fresh context"* or *"fan out parallel reviewers"*, this adapter tells you the literal Claude Code move.
 
 ---
 
 ## Install
+
+**The one-command path:** `keel init --with-cc-adapter` (run it in your project,
+like `git init`) does steps 1–4 below for you — it copies `CLAUDE.md`, the doc
+funnel, the memory seeds (into `.keelwright/memory-seeds/`), and the hook snippet
+(into `.keelwright/hooks/`), filling the placeholders it knows. The manual steps
+below are the same actions, spelled out, if you'd rather wire it by hand.
 
 From your project root (the repo where Claude Code runs):
 
 | Step | Action |
 |---|---|
 | 1 | Copy `CLAUDE.md.tmpl` → `<repo>/CLAUDE.md`, fill the `{{PLACEHOLDERS}}`. |
-| 2 | Create the Keel doc funnel (see `../../core/` and `../../templates/`): `docs/PROJECT_RULES.md`, `docs/BACKLOG.md`, `docs/ROADMAP.md`, `docs/NEXT-STEPS.md`, `docs/PRD.md`. |
+| 2 | Create the Keelwright doc funnel (see `../../core/` and `../../templates/`): `docs/PROJECT_RULES.md`, `docs/BACKLOG.md`, `docs/ROADMAP.md`, `docs/NEXT-STEPS.md`, `docs/PRD.md`. |
 | 3 | Copy `memory/MEMORY.md.tmpl` → your Claude Code auto-memory dir as `MEMORY.md`, then drop in the seed memories from `memory/_SEED_MEMORIES.md` (one file each). |
 | 4 | Merge `hooks/settings.snippet.json` into `<repo>/.claude/settings.json` (see `hooks/README.md`). |
 | 5 | (Optional) Add a headless-browser driver under `scripts/` for ritual 6 live verification (see `rules/RITUALS-IN-CLAUDE-CODE.md`). |
-| 6 | Tell the agent once: *"Honor the Keel rituals in `docs/PROJECT_RULES.md`."* — `CLAUDE.md` makes this stick. |
+| 6 | Tell the agent once: *"Honor the Keelwright rituals in `docs/PROJECT_RULES.md`."* — `CLAUDE.md` makes this stick. |
 
 Auto-memory lives outside the repo (per-project, persists across sessions). Everything else is committed with the project.
 

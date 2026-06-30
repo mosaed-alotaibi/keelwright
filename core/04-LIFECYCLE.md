@@ -180,7 +180,7 @@ spot-check that the rounds happened — never the trigger for them.
 
 ## 5. Resume-safe hand-off
 
-A change is not really done until the next reader can pick up cold. Keel treats
+A change is not really done until the next reader can pick up cold. Keelwright treats
 the hand-off as a first-class output of the loop, kept **always current** so a
 context reset is safe at *any* moment.
 

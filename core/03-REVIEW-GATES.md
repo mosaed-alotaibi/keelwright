@@ -1,6 +1,6 @@
 # Review Gates — the convergence cadence
 
-> The engine behind Keel's review rituals. This file defines *how* a piece of
+> The engine behind Keelwright's review rituals. This file defines *how* a piece of
 > work is judged ready: not by one look, but by repeated adversarial passes that
 > must run dry before you stop. It is tool-agnostic — the reviewer can be a
 > separate agent session, a second AI, or a different person.
@@ -86,7 +86,7 @@ still takes **3** (round 1 is groundwork; rounds 2–3 are the qualifying pair).
 
 ## 4. Two gates: LIGHT feeds HEAVY
 
-Keel uses the same round/cadence machinery at two scopes. The light gate is an
+Keelwright uses the same round/cadence machinery at two scopes. The light gate is an
 early-catch net; the heavy gate is the completion seal.
 
 | | **LIGHT gate** | **HEAVY gate** |
@@ -290,7 +290,7 @@ exist to catch.
 
 ## 7. Evidence over assertion (the claim gate)
 
-Tie this to Keel's core value: **never assert "done" / "clean" / "ready" /
+Tie this to Keelwright's core value: **never assert "done" / "clean" / "ready" /
 "in sync" without showing the verification in the same breath, before the
 claim.** For the heavy gate specifically:
 

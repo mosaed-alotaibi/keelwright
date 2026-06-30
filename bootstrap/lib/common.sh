@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
-# Keel bootstrap — shared helpers. Sourced by init.sh; not meant to run alone.
+# Keelwright bootstrap — shared low-level helpers. Sourced by the `keel` CLI and
+# `bootstrap/init.sh`; not meant to run alone.
 # POSIX-bash, portable across macOS (BSD) and Linux (GNU) userland.
 
 # --- logging -----------------------------------------------------------------
 # Colorize only when stderr is a TTY, so piped/CI output stays clean.
 if [ -t 2 ]; then
   _C_RED=$'\033[31m'; _C_GRN=$'\033[32m'; _C_YEL=$'\033[33m'
-  _C_BLU=$'\033[34m'; _C_DIM=$'\033[2m';  _C_RST=$'\033[0m'
+  _C_BLU=$'\033[34m'; _C_DIM=$'\033[2m';  _C_BLD=$'\033[1m'; _C_RST=$'\033[0m'
 else
-  _C_RED=''; _C_GRN=''; _C_YEL=''; _C_BLU=''; _C_DIM=''; _C_RST=''
+  _C_RED=''; _C_GRN=''; _C_YEL=''; _C_BLU=''; _C_DIM=''; _C_BLD=''; _C_RST=''
 fi
 
-log()  { printf '%s\n' "${_C_BLU}keel${_C_RST} $*" >&2; }
+log()  { printf '%s\n' "${_C_BLU}keelwright${_C_RST} $*" >&2; }
 ok()   { printf '%s\n' "${_C_GRN}  ok${_C_RST} $*" >&2; }
 warn() { printf '%s\n' "${_C_YEL}warn${_C_RST} $*" >&2; }
 err()  { printf '%s\n' "${_C_RED} err${_C_RST} $*" >&2; }
@@ -20,7 +21,7 @@ die()  { err "$*"; exit 1; }
 
 # --- placeholder substitution ------------------------------------------------
 # Escape a replacement string so it is safe on the right-hand side of sed's
-# s/// (escapes &, \, and the delimiter |). Keeps init.sh portable without
+# s/// (escapes &, \, and the delimiter |). Keeps us portable without
 # depending on GNU-only sed features.
 sed_escape_replacement() {
   printf '%s' "$1" | sed -e 's/[&\\|]/\\&/g'
@@ -32,7 +33,7 @@ sed_escape_replacement() {
 subst_placeholders() {
   _sp_file="$1"; shift
   [ -f "$_sp_file" ] || { warn "subst: no such file: $_sp_file"; return 0; }
-  _sp_tmp="${_sp_file}.keel.tmp.$$"
+  _sp_tmp="${_sp_file}.keelwright.tmp.$$"
   cp "$_sp_file" "$_sp_tmp" || return 1
   while [ "$#" -ge 2 ]; do
     _sp_name="$1"; _sp_val="$2"; shift 2
@@ -66,4 +67,11 @@ copy_one() {
 strip_tmpl() { printf '%s' "${1%.tmpl}"; }
 
 # today's date in ISO form, portable.
-keel_today() { date +%Y-%m-%d; }
+keelwright_today() { date +%Y-%m-%d; }
+
+# slugify <string> — lowercase, non-alnum runs → single dash, trim dashes.
+slugify() {
+  printf '%s' "$1" \
+    | tr '[:upper:]' '[:lower:]' \
+    | sed -e 's/[^a-z0-9]\{1,\}/-/g' -e 's/^-//' -e 's/-$//'
+}

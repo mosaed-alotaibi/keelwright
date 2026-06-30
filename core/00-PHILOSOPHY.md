@@ -1,8 +1,8 @@
-# Keel — Philosophy
+# Keelwright — Philosophy
 
-> The durable principles behind Keel. Tool-agnostic: they read the same whether
+> The durable principles behind Keelwright. Tool-agnostic: they read the same whether
 > your "agent" is an AI coding assistant, a second AI, or a human engineer.
-> Everything else in Keel — the rituals, the doc model, the lifecycle loop —
+> Everything else in Keelwright — the rituals, the doc model, the lifecycle loop —
 > is machinery for living these principles. When a rule and a principle seem to
 > conflict, the principle wins; the rule is wrong or out of date.
 
@@ -13,7 +13,7 @@ real work — and never claim what you haven't shown.**
 
 ## The principles
 
-| # | Principle | Why it matters | How it shows up in Keel |
+| # | Principle | Why it matters | How it shows up in Keelwright |
 |---|---|---|---|
 | 1 | **Evidence over claims** | "Done" asserted is not "done" verified; the gap between the two is where regressions hide. | Never say *done / fixed / clean / safe to reset* without running and **showing** the check in the same turn. Behavioral tests, live renders, queried state — not code-reading — are the proof. See [`04-LIFECYCLE.md`](04-LIFECYCLE.md), [`02-RITUALS.md`](02-RITUALS.md). |
 | 2 | **Harden, don't defer** | A system that works *and* is hardened beats one that works *sooner*; latent risk closed while the context is fresh is far cheaper than a 2am incident later. | When in doubt, harden. Close the security/edge/failure path now rather than filing it. Make guarantees *literally* true, not aspirational. Provisioning order — every referenced resource present before its reference is evaluated, each value reaching the component that consumes it — is part of this, not an afterthought. |

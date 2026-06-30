@@ -1,6 +1,6 @@
 # Rituals in Claude Code — concrete playbooks
 
-The Keel rituals are defined tool-agnostically in [`../../../core/02-RITUALS.md`](../../../core/02-RITUALS.md). This file is the literal Claude Code "how" for each. Where core says *"an independent reviewer in a fresh context"*, here it means **a new subagent spawned via the Agent tool**. Where it says *"fan out parallel reviewers"*, it means **the Workflow tool** (or several Agent-tool subagents).
+The Keelwright rituals are defined tool-agnostically in [`../../../core/02-RITUALS.md`](../../../core/02-RITUALS.md). This file is the literal Claude Code "how" for each. Where core says *"an independent reviewer in a fresh context"*, here it means **a new subagent spawned via the Agent tool**. Where it says *"fan out parallel reviewers"*, it means **the Workflow tool** (or several Agent-tool subagents).
 
 > **Why the numbering jumps 1 → 5:** rituals 2 (verification-driven), 3 (proactive-but-cautious), and 4 (don't hand-curate tool-owned state) have no distinct Claude Code mechanism — they live in the `CLAUDE.md` defaults + the seed memories (`feedback_evidence_over_claims`, `feedback_proactive_but_cautious`, `feedback_tool_owned_state`), not as a subagent/hook playbook. See [`../README.md`](../README.md) and `../memory/_SEED_MEMORIES.md`.
 
@@ -38,7 +38,7 @@ Playbook:
 **Goal:** never claim a UI/behavioral surface works without a captured artifact. Pure-backend logic with deterministic tests is exempt; anything user-facing is not.
 
 Playbook:
-- Use a **headless-browser driver script** under your project `scripts/` — a CDP/Playwright-style "drive one real turn + screenshot" plus a "navigate to route + screenshot" helper. Keel does not ship one (stacks vary); add a thin driver for `{{WEB_FRAMEWORK}}` (see README install step 5).
+- Use a **headless-browser driver script** under your project `scripts/` — a CDP/Playwright-style "drive one real turn + screenshot" plus a "navigate to route + screenshot" helper. Keelwright does not ship one (stacks vary); add a thin driver for `{{WEB_FRAMEWORK}}` (see README install step 5).
 - Boot the stack, drive a real interaction, capture the screenshot, and where state matters, query the datastore to confirm the write.
 - Attach/point to the captured artifact in your claim. "Looks right" is not evidence.
 - For functional vs. design sign-off: passing the functional gate is **not** design approval — show the screenshot and get the owner's look-approval before sealing UI.
@@ -156,6 +156,20 @@ Playbook:
 4. **One pass, then decide — never a second reviewer round.** Two no-authority reviewers only manufacture a consensus the orchestrator would override. If the single pass is genuinely inconclusive, **escalate to the owner**, not to another subagent.
 
 > Why a *single* bounded pass: this is Principle 11 (*challenge — adversarially, and bound it*) applied to janitorial actions — enough rigor to catch a one-way mistake (a force-deleted ref, a clobbered shared config), bounded so the gate stays cheap and loop-free. Any fix the verdict produces still obeys single-writer discipline (ritual 13).
+
+---
+
+## Ritual 16 — Dependency-reality check
+
+**Goal:** before designing or building against an unfamiliar / fast-moving / post-knowledge-cutoff dependency, confirm its **real** behavior against the installed artifact — not prose docs, not your priors.
+
+Playbook:
+- **Read/Grep the installed package, not the docs site.** Open the dependency's source + type definitions where they actually live on disk (`node_modules/<pkg>`, the site-packages dir, a vendored copy) plus the **lockfile** for the exact installed version. Confirm error/return semantics, the real export/import paths, which helper actually wraps the behavior you need, and the current CLI/API surface **for that version** — not an older or newer one.
+- **Probe when the source is unclear.** If you can't confirm a behavior by reading, have a subagent (or a throwaway script) exercise it and report the *actual* result back — don't assume.
+- **Pin the exact version** you verified against, and treat a fast release cadence as a standing patch obligation: re-check on upgrade.
+- This is **disciplined design-time tool use, not orchestration** — no hook or special swarm is required (a subagent can do the read and hand you back the confirmed semantics). A dependency premise feeds the Ritual 5 coherence pass: when a design rests on "the dependency does X," cite **where** in the installed package you confirmed X.
+
+> Designing from priors alone yields config that is plausible but wrong — exactly the class of defect the early gates exist to catch before the completion ritual.
 
 ---
 

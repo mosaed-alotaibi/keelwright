@@ -1,6 +1,6 @@
-# Gated Swarm — running Keel's gates as parallel fan-out without weakening them
+# Gated Swarm — running Keelwright's gates as parallel fan-out without weakening them
 
-Keel's gates ([`../../../core/03-REVIEW-GATES.md`](../../../core/03-REVIEW-GATES.md)) and
+Keelwright's gates ([`../../../core/03-REVIEW-GATES.md`](../../../core/03-REVIEW-GATES.md)) and
 lifecycle ([`../../../core/04-LIFECYCLE.md`](../../../core/04-LIFECYCLE.md)) read as a
 *sequential* chain. They do **not** have to run sequentially. Core already says so —
 `03-REVIEW-GATES.md §6`: *"You can **fan out** multiple fresh reviewers in parallel for

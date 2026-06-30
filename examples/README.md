@@ -1,6 +1,6 @@
-# Keel examples
+# Keelwright examples
 
-A worked, **fully-populated** Keel doc funnel for a tiny toy project — so you can
+A worked, **fully-populated** Keelwright doc funnel for a tiny toy project — so you can
 see what the [`templates/`](../templates/) look like once filled, before you fill
 your own.
 
@@ -63,10 +63,17 @@ each stage, referenced elsewhere by ID — is the anti-drift discipline in actio
 ## Generate your own
 
 This example was hand-filled to read well. To scaffold the **blank** version for a
-real project, run the installer:
+real project, run `keel init` in it (interactive, like `git init`):
 
 ```sh
-../bootstrap/init.sh /path/to/your/project --name "Your Project" --slug your-project
+cd /path/to/your/project
+keel init
+```
+
+Or non-interactively / from CI:
+
+```sh
+keel init /path/to/your/project --yes --name "Your Project" --slug your-project
 ```
 
 Then fill the placeholders — using this example as a reference for tone and depth.

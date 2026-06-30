@@ -1,10 +1,50 @@
 # Changelog
 
-All notable changes to Keel are recorded here. Format loosely follows
+All notable changes to Keelwright are recorded here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow
 [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+## [0.3.0] — 2026-07-01
+
+### Renamed
+
+- **The framework is now `Keelwright`** (was `Keel`). The methodology, every doc,
+  template, the adapter, the installer internals, and the consuming-project state
+  directory (`.keel/` → `.keelwright/`) were rebranded. The **CLI command stays
+  `keel`** — `keel init` is the entry point, deliberately kept short like `git`.
+  Releases `0.1.0`–`0.2.0` were published under the former name *Keel*; their
+  entries below are preserved as history.
+
+### Added
+
+- **`keel` CLI with an interactive `keel init`.** Bootstraps a project the way
+  `git init` does — run it in (or point it at) a directory and it asks, interactively,
+  for the project name / slug / owner / stack / repo, whether to install the Claude
+  Code adapter, and whether to `git init`, then lays down the doc funnel and writes a
+  `.keelwright/config` marker. A non-interactive `--yes` + flags cover scripting / CI;
+  `--dry-run` writes nothing; it refuses to re-init or to overwrite without `--force`.
+  Pure bash, no dependencies, symlink-friendly so it works from `PATH`.
+- **`bootstrap/lib/install.sh`** — the install engine extracted so the new `keel init`
+  and the legacy `bootstrap/init.sh` share one proven code path (generalize once a
+  second real consumer appears).
+- **`VERSION`** — a single canonical home for the version, read by `keel`, the
+  installer, and the project marker.
+- **`CONTRIBUTING.md`** — how changes flow through the framework's own loop + gates,
+  the three-layer rule, the CLI test recipe, and the release checklist.
+- **`assets/keelwright-logo.png`** + a rewritten **`README.md`** — a logo hero, the
+  "why it exists" framing, a `keel init` quick start, the 60-second mental model, and
+  an adopt / extend section for open-source contributors.
+
+### Changed
+
+- **`bootstrap/init.sh`** rewritten as a thin non-interactive front-end over the
+  shared engine; its documented `<dir> [flags]` interface is unchanged.
+- **Installer placeholders** `{{KEEL_CORE_PATH}}` / `{{KEEL_ADAPTER_PATH}}` →
+  `{{KEELWRIGHT_CORE_PATH}}` / `{{KEELWRIGHT_ADAPTER_PATH}}` (the templates and the
+  substitution map were updated in lockstep). Adapter memory seeds and hook snippets
+  now install under `.keelwright/`; the installer scratch suffix is `*.keelwright.tmp.*`.
 
 ## [0.2.0] — 2026-06-30
 
@@ -203,5 +243,6 @@ The first portable, generalized cut of the framework.
   filled-in Keel docs look like end to end.
 - Repo glue: `README.md`, `LICENSE` (MIT), `.gitignore`, this changelog.
 
+[0.3.0]: #030--2026-07-01
 [0.2.0]: #020--2026-06-30
 [0.1.0]: #010--initial-release

@@ -1,8 +1,8 @@
-# Keel — Glossary
+# Keelwright — Glossary
 
-> Concise definitions of the Keel terms used across `core/`. Tool-agnostic:
+> Concise definitions of the Keelwright terms used across `core/`. Tool-agnostic:
 > each term reads the same whether the actor is an AI coding agent, a second AI,
-> or a human. Where a term has a concrete Keel mechanism, the relevant `core/`
+> or a human. Where a term has a concrete Keelwright mechanism, the relevant `core/`
 > file is linked.
 
 ---
@@ -11,7 +11,7 @@
 
 | Term | Definition |
 |---|---|
-| **Agent** | Whoever (or whatever) does the work: an AI coding assistant, a second AI, or a human engineer. Keel is written so every principle applies to all three. The agent also **orchestrates** a multi-round ritual — dispatching each round to an independent reviewer, applying the fixes a round surfaces, and deciding when the exit condition is met — and never delegates the *decision* to stop (it "orchestrates and **owns the review cadence**", [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md)). |
+| **Agent** | Whoever (or whatever) does the work: an AI coding assistant, a second AI, or a human engineer. Keelwright is written so every principle applies to all three. The agent also **orchestrates** a multi-round ritual — dispatching each round to an independent reviewer, applying the fixes a round surfaces, and deciding when the exit condition is met — and never delegates the *decision* to stop (it "orchestrates and **owns the review cadence**", [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md)). |
 | **Owner** | The person who holds genuine go/no-go on binding decisions (merges, pushes, releases, which goal to pursue, and genuine gray-area forks). The owner is the *second* reviewer, never the first — see *recommend-don't-decide* and [`00-PHILOSOPHY.md`](00-PHILOSOPHY.md). |
 | **Independent reviewer** | A reviewer working in a **fresh context** with no memory of how the work was produced — a separate agent session, a second AI, or a different person. The truest test of whether the *written* record stands on its own, because they can only see what was written down, not what's in the author's head. |
 | **Single writer** | The rule that durable shared artifacts (rituals, doc updates, cross-session notes) are written by **one** actor at a time, to avoid lost updates when work is fanned out in parallel. |
@@ -42,7 +42,7 @@
 | **Convergence cadence** | The iterative self-review applied to each high-leverage artifact (spec, plan, execution-approach): run a **minimum of 3** review iterations and stop only when the **two most recent are both clean**. The first iteration is mandatory groundwork and doesn't count toward the exit. See [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §2. |
 | **Convergence** | The state of having met a cadence's exit condition (e.g. floor met **and** two consecutive clean passes). On convergence, an artifact is approved *by default* and the agent proceeds — it does not pause to ask permission to continue. See [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §2. |
 | **Iteration / round** | One genuine adversarial review pass. It either **finds an issue** (→ fix it; this iteration is a *fail*, and a fix **resets** the consecutive-clean streak) or **finds nothing needing change** (a *clean pass*). "Genuine" means a fresh look with a distinct lens emphasis — never a rubber-stamp of the prior round. See [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §1. |
-| **Clean pass** | A review iteration that finds nothing needing change. Two *consecutive* clean passes (above the floor) is the universal exit condition for Keel's review rituals. See [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §1–§2. |
+| **Clean pass** | A review iteration that finds nothing needing change. Two *consecutive* clean passes (above the floor) is the universal exit condition for Keelwright's review rituals. See [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §1–§2. |
 | **Completion ritual** | (a.k.a. *seal ritual* / *pre-done confirmation ritual*) The heavyweight gate before any "done" milestone — sealing, merging, releasing, or resetting context. Run as **independent-reviewer rounds in fresh context** (≥3 rounds, exit on 2 consecutive clean), so the review also tests whether the written handoff is resume-ready. Distinct from the per-artifact coherence pass, which it builds on. See [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §4 (heavy gate) and [`02-RITUALS.md`](02-RITUALS.md). |
 | **Claim gate** | The non-negotiable rule that you never *assert* "done / fixed / clean / safe to reset / in sync" without, in the **same turn and before the claim**, running and **showing** the verifying evidence. Asserting first and being asked to prove it later is a violation. The same bar applies to an **inbound** claim you *receive* (a defect/risk report from a person, tool, or other agent): verify it against the live code with concrete file-and-line evidence before acting on it. See [`02-RITUALS.md`](02-RITUALS.md) Ritual 1. |
 | **Findings ledger** | The shared `open · fixed · wontfix` record (with each finding's **severity**) that a multi-round, fresh-context review loop hands to every new reviewer so they report only **new** issues — the precondition that stops a no-memory parallel loop from re-reporting known findings and oscillating forever. The single fixer updates it between rounds. See [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §6. |
@@ -78,7 +78,7 @@
 
 | Term | Definition |
 |---|---|
-| **Behavioral test** | A test derived from a real business or technical *claim*, verifying behavior at a user- or system-facing surface — not an implementation detail. The kind Keel asks you to write. See [`02-RITUALS.md`](02-RITUALS.md). |
+| **Behavioral test** | A test derived from a real business or technical *claim*, verifying behavior at a user- or system-facing surface — not an implementation detail. The kind Keelwright asks you to write. See [`02-RITUALS.md`](02-RITUALS.md). |
 | **Test-effectiveness audit** | A periodic check that the tests you *have* would actually fail if the behavior they protect broke — i.e. they're not vacuous, over-mocked, or tautological. "N passed" is not, on its own, proof of quality. |
 | **Live verification** | Confirming a user-facing or behavioral change actually works by **exercising it for real** (rendering the UI, driving the flow, querying the resulting state) and inspecting the *actual* result — never claiming it works from code-reading alone. |
 

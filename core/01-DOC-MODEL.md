@@ -1,6 +1,6 @@
-# Keel — Documentation Model & Anti-Drift Discipline
+# Keelwright — Documentation Model & Anti-Drift Discipline
 
-> The canonical home for how Keel projects organize their docs. This file *is*
+> The canonical home for how Keelwright projects organize their docs. This file *is*
 > the doc-model; every other doc points **here** rather than re-describing the
 > funnel (obeying its own guardrail — see #2 below).
 >
@@ -152,7 +152,7 @@ docs; it never restates their content (Guardrail A).
 ## 7. Keeping the funnel honest
 
 Anti-drift is not a one-time setup — it's a standing discipline that pairs with
-two ideas elsewhere in Keel:
+two ideas elsewhere in Keelwright:
 
 - **State-change currency** ([`02-RITUALS.md`](02-RITUALS.md) §10): right after any action that changes durable state (a merge, a ship, a deferral, a branch), sweep the front-door docs and cross-session notes for claims the change just falsified, and fix them *before ending the turn*. Prefer **drift-proof phrasing** ("check the current state via `<command>`") over hardcoded facts that re-stale on the next change.
 - **Leave history alone:** dated artifacts — the archive, past specs/plans, "why" notes — describe *past* state and stay as-is. Only the *living* front-door docs and *current-state* notes get reconciled. History is a record, not a thing to keep current.

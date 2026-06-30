@@ -13,9 +13,9 @@ yarn-error.log*
 pnpm-debug.log*
 
 # --- bootstrap installer scratch (temp files written during substitution) ---
-*.keel.tmp.*
+*.keelwright.tmp.*
 
-# --- Keel-managed state in a CONSUMING project (kept out of the framework repo) ---
+# --- Keelwright-managed state in a CONSUMING project (kept out of the framework repo) ---
 # The SessionEnd hook writes memory snapshots into a target project, not here; ignored defensively.
 .harness/memory-snapshots/
 

@@ -1,6 +1,6 @@
-# Keel hooks for Claude Code
+# Keelwright hooks for Claude Code
 
-Two hooks that make Keel rituals fire automatically instead of relying on the agent to remember. Source: [`settings.snippet.json`](settings.snippet.json).
+Two hooks that make Keelwright rituals fire automatically instead of relying on the agent to remember. Source: [`settings.snippet.json`](settings.snippet.json).
 
 > Hooks are executed by the Claude Code harness, not by the model. That's the point: a reminder the harness injects can't be "forgotten" the way an in-context instruction can.
 

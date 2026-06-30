@@ -1,6 +1,6 @@
 # scripts/ — placeholder
 
-Keel ships **no** headless-browser driver: stacks vary too much for one to be portable.
+Keelwright ships **no** headless-browser driver: stacks vary too much for one to be portable.
 The driver belongs in **your project's** `scripts/` directory (run from your project root),
 not here. This file exists only so the directory is tracked and the intent is documented.
 

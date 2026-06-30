@@ -1,4 +1,4 @@
-# Keel — The Rituals
+# Keelwright — The Rituals
 
 > The standing rituals that govern every phase, plan, and work session. These
 > are long-lived: they apply across the whole lifecycle loop, not to any single
