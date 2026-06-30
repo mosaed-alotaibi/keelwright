@@ -19,6 +19,8 @@ Playbook:
 
 > The 1st pass is foundational and uncounted — it establishes the baseline. Count clean rounds *after* it.
 
+> **Swarm form:** a single round may **fan out** N verdict-blind auditors (each a distinct lens) in parallel and collapse to ONE conservative verdict (CLEAN iff *all* clean). Rounds still run strictly in sequence against post-fix state, and the streak lives only in the orchestrator — breadth inside a round is not depth over time. See [`GATED-SWARM.md`](GATED-SWARM.md) §3.
+
 ---
 
 ## Ritual 5 — Coherence pass per artifact
@@ -67,6 +69,8 @@ Playbook — pick the shape:
 | Producing the artifact itself | **Subagent-driven**: one subagent drafts, another critiques, you reconcile. |
 
 Loop-until-converged with the Workflow tool: define the artifact, the critique rubric, and the exit condition (2 consecutive clean). Let it iterate; you own the final verdict.
+
+> Keep the streak loop in the **orchestrator** (the main thread), not inside the workflow: workers vote *within* a round; the orchestrator owns the round *sequence* and the EXIT. Concrete recipes + the per-phase barrier-vs-fan-out map: [`GATED-SWARM.md`](GATED-SWARM.md).
 
 ---
 
@@ -122,6 +126,8 @@ Playbook:
 - **Explore** read-only → fan out many subagents freely.
 - **Implement** in parallel → only on *disjoint* files; never two writers on one path.
 - **Rituals + doc/memory writes** → single-writer, serial. No worktrees over a shared hub for these.
+
+> [`GATED-SWARM.md`](GATED-SWARM.md) §1–§2, §6 turns this taxonomy into an operating model: the Orchestrator is the single writer for the funnel/memory/streak; Workers are read-only auditors or disjoint-file implementers that *return* content and never touch a shared hub.
 
 ---
 

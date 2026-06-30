@@ -15,11 +15,11 @@
     ],
     "SessionEnd": [
       {
-        "//": "Ritual 12 — lessons-learned + durable-notes snapshot. Stub: reminds, and snapshots the memory index if present.",
+        "//": "Ritual 12 — lessons-learned + durable-notes snapshot. Reminds, snapshots the memory index to .harness/memory-snapshots, and prunes to the newest 20.",
         "hooks": [
           {
             "type": "command",
-            "command": "printf '%s\\n' 'KEEL ritual 12 (lessons-learned): before ending, append concise issues/mitigations/lessons to docs/lessons-learned/ and confirm the NEXT-STEPS cursor + auto-memory are current.'; SNAP_DIR=\"${CLAUDE_PROJECT_DIR:-.}/.keel/snapshots\"; mkdir -p \"$SNAP_DIR\" 2>/dev/null && cp \"${CLAUDE_MEMORY_DIR:-$HOME/.claude/memory}/MEMORY.md\" \"$SNAP_DIR/MEMORY.$(date +%Y%m%d-%H%M%S).md\" 2>/dev/null || true"
+            "command": "printf '%s\\n' 'KEEL ritual 12 (lessons-learned): before ending, append concise issues/mitigations/lessons to docs/lessons-learned/ and confirm the NEXT-STEPS cursor + auto-memory are current.'; SNAP_DIR=\"${CLAUDE_PROJECT_DIR:-.}/.harness/memory-snapshots\"; mkdir -p \"$SNAP_DIR\" 2>/dev/null && cp \"${CLAUDE_MEMORY_DIR:-$HOME/.claude/memory}/MEMORY.md\" \"$SNAP_DIR/MEMORY.$(date +%Y%m%d-%H%M%S).md\" 2>/dev/null; ls -1t \"$SNAP_DIR\"/MEMORY.*.md 2>/dev/null | tail -n +21 | xargs rm -f 2>/dev/null || true"
           }
         ]
       }
