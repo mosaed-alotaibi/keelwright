@@ -42,6 +42,36 @@ All notable changes to Keel are recorded here. Format loosely follows
 
 ### Changed
 
+- **`core/02-RITUALS.md` — Ritual 5 (coherence pass)** gained a
+  **Constraint-vs-behavior joint-satisfiability** lens: when an artifact settles
+  *both* a hard constraint ("component / file X is off-limits / unchanged") and a
+  behavior only X could deliver ("gate / alter / observe what X owns"), verify the
+  two are *jointly satisfiable* — a seam delivers the behavior without touching X
+  — before recording both as settled; an atomic operation exposing no hook can't
+  satisfy both, so catch the contradiction at the spec, not three rounds later as
+  an "impossible" task. Mirrored as a lens row in `core/03-REVIEW-GATES.md` §5;
+  glossary entry added.
+- **`core/04-LIFECYCLE.md` §2 (brainstorm/design stage)** — new **"Surface a
+  request's hidden forks before building"** discipline: an *analogy-driven*
+  request ("build it like X") can conceal a fork in the underlying *mechanism*
+  where the branches differ materially (configuration, threat/security surface) —
+  surface the fork with its trade-offs as an owner decision rather than picking
+  one by inference; and a *"remove / simplify X"* request can hide a load-bearing
+  shared **backbone** X merely rides on (X may be a *mode of* the backbone, not
+  its replacement) — separate the surface feature from the backbone and confirm
+  the backbone stays before specifying removals ("remove the X integration" ≠
+  "remove the system X plugs into"). Tied to recommend-don't-decide (Principle 5);
+  the removal-backbone trap is also echoed in `core/02-RITUALS.md` Ritual 5's
+  *Premise vs reality* lens.
+- **`core/04-LIFECYCLE.md` §1 (green baseline)** — sharpened the "kill stray
+  processes" guidance with **process-provenance**: killing strays isn't enough —
+  confirm a running server's command path belongs to *this* checkout before
+  trusting it as "the app" (a leftover server from another or archived checkout
+  can hold the canonical ports, and you can nearly verify against the wrong
+  codebase), and detect environment surfaces by a **stable URL path, not a
+  hardcoded port** (a port can be squatted by an unrelated process). Echoed in the
+  completion ritual's *operational sanity* lens (`core/04-LIFECYCLE.md` §4 and
+  `core/02-RITUALS.md` Ritual 1).
 - **`core/02-RITUALS.md` — Ritual 5 (coherence pass)** gained an
   **Identifier-boundary footprint** lens: for a rename or split-identifier
   change, enumerate the *full* cross-boundary footprint — redirects/routes,

@@ -113,7 +113,11 @@ exact words, then confirm the neighbourhood is clean too before closing it.
     (see Ritual 7).
   - **Operational sanity** — the *documented* run/boot commands work from a
     clean state (kill stray processes first; don't trust a smoke against a
-    leftover process or inherited env).
+    leftover process or inherited env). Killing isn't enough: confirm a running
+    server's command path belongs to *this* checkout before trusting it as "the
+    app" — a leftover server from another or archived checkout can hold the
+    canonical ports and you can verify against the wrong codebase — and key
+    environment surfaces off a stable URL path, not a hardcoded port.
   - **Visual sign-off** — any user-facing visual change in scope has explicit
     owner look-approval, not just live-verification that it works (Ritual 6).
   - **Decision-vs-reality drift** — no locked decision the code silently
@@ -226,6 +230,10 @@ surface them if they need a decision), then proceed:
   state" inherited from a catalog or a prior note — each is a **hypothesis to
   confirm, not a fact**. Designing on top of an unchecked premise propagates the
   error into everything downstream; confirm the premise before you rely on it.
+  (A "remove / simplify X" premise hides the same trap — confirm X is the
+  surface feature, not a shared backbone X merely *rides on*, before specifying
+  its removal; the brainstorm-stage version is in
+  [`04-LIFECYCLE.md`](04-LIFECYCLE.md) §2.)
 - **Backward-compat** — no change breaks an existing caller, test, env default,
   or contract; new config has safe defaults; a signature/return-type change has
   *every* call site accounted for.
@@ -239,6 +247,17 @@ surface them if they need a decision), then proceed:
   and a **path-keyed tool** can report a clean lockfile while consumers built on
   the old identifier quietly break. Grep every surface for both forms before
   calling the rename complete.
+- **Constraint-vs-behavior joint-satisfiability** — when an artifact asserts
+  **both** a hard constraint ("component / file X is off-limits / stays
+  unchanged") **and** a behavior that only X could deliver ("gate / alter /
+  observe what X owns"), verify the two are **jointly satisfiable** *before*
+  recording both as settled: a seam must exist that delivers the behavior
+  **without touching X**. An *atomic* operation that exposes no hook satisfies the
+  constraint or the behavior but not both — and a spec that locks in the
+  contradiction surfaces it three rounds later as an "impossible" task. Find the
+  seam (a wrapper, an interception point, a side channel X already emits), or
+  surface the conflict as an owner decision now; don't settle both halves until
+  one of those holds.
 - **No placeholders** — no TBD/TODO/"handle errors"/vague steps; code steps show
   real code; commands show expected output.
 - **Internal + cross-artifact consistency** — types, names, and decisions agree

@@ -23,6 +23,14 @@ A green baseline means, from a clean checkout:
 - The documented build / boot / run commands actually work **from a clean
   state** — not against a leftover process or inherited environment. Kill stray
   background processes first, then boot fresh and confirm the environment loads.
+  Killing stray processes is **not enough on its own**: before you trust any
+  already-running server as "the app," **confirm its command path belongs to
+  THIS checkout.** A leftover server from a *different* or *archived* checkout can
+  hold the canonical ports, and you can spend a whole session nearly verifying
+  against the **wrong codebase** — green there proves nothing about your change.
+  And **detect which environment a surface is by a stable URL path, not a
+  hardcoded port** — a port can be squatted by an unrelated process, so a port
+  number is not a reliable identity for the thing answering on it.
 - The test suite passes, and you have **looked at** the pass — counts and
   surfaces, not just an exit code.
 - The "start here" / resume pointers route you to the *current* state of the
@@ -72,6 +80,31 @@ stage consumes, and each gets a review gate sized to its leverage.
 | **Execute** | The actual change — built against the plan, tests derived from claims. | **Full cadence** on the execution-approach decision (how the plan is carried out — see [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §4), then a **light gate** per unit of work; behavioral verification as you go. |
 | **Verify** | Evidence the change works at its real surface (tests, live render, queried state). | **Evidence gate** — show the result, analyze the *actual* output, not the intended one. |
 | **Seal** | The change merged / shipped / closed, with the hand-off reconciled. | **Completion ritual** — the full heavy gate (§4). |
+
+### Surface a request's hidden forks before building
+
+The brainstorm/design stage is where a request's **hidden decisions** become
+**explicit owner choices** — *before* anything is built. Two shapes hide a fork
+especially well, and both belong to the owner under recommend-don't-decide
+([`00-PHILOSOPHY.md`](00-PHILOSOPHY.md) Principle 5) — surface them rather than
+silently picking a branch:
+
+- **An analogy-driven request ("build it like X")** can conceal a fork in the
+  underlying *mechanism* where the branches differ materially — in
+  configuration, or in threat / security surface. "Like X" names a resemblance,
+  not a mechanism; the resemblance often spans two mechanisms that look alike on
+  the surface but diverge where it counts. Name the fork and its trade-offs as an
+  owner decision instead of resolving it by inference.
+- **A "remove / simplify X" request** can hide a load-bearing shared **backbone**
+  that X merely *rides on* — X may be a *mode of* the backbone, not its
+  replacement. Separate the **surface feature being removed** from the
+  **backbone it rides on**, and confirm the backbone stays before specifying any
+  removal. *"Remove the X integration" ≠ "remove the system X plugs into."*
+  Pull the wrong layer and the removal takes out far more than the request meant.
+
+In both cases the move is the same: make the buried choice visible, present the
+branches with their trade-offs, and let the owner pick the genuine fork — the
+agent recommends, the owner decides.
 
 ### Convergence is approval — proceed automatically
 
@@ -133,7 +166,7 @@ The ritual's lenses, each round (vary the emphasis — [`03-REVIEW-GATES.md`](03
 | **Hand-off completeness** | Operational prereqs covered (services up, env present, deps installed, tests verified); cited revisions match reality (prefer "run the log command" over pinning a hash that drifts). |
 | **Repo state** | Clean tree, tests green, only the expected untracked files. |
 | **Test effectiveness** | The suite would actually catch a real regression — not vacuous, over-mocked, or tautological; risk paths covered or gaps named. "N passed" is not proof of quality on its own. |
-| **Operational sanity** | The documented run/boot commands work from a clean state. |
+| **Operational sanity** | The documented run/boot commands work from a clean state — and a running server you trust as "the app" is confirmed to belong to *this* checkout (a leftover process from another checkout can squat the canonical ports), with environment surfaces keyed off a stable URL path, not a hardcoded port. |
 | **Design-vs-reality drift** | No locked decision the code now contradicts (documented overrides are fine; silent contradictions are not). |
 | **Commit narrative** | A stranger reading the commit log understands the path taken. |
 
