@@ -207,7 +207,7 @@ separate:
   FAILs the whole round.
 - **Depth (serial).** The streak still counts **rounds**, and rounds stay
   **serialized** — each new round reads the snapshot the previous round's fixes
-  produced, so "two *consecutive* clean" stays well-defined. The owner alone owns
+  produced, so "two *consecutive* clean" stays well-defined. The agent running the gate owns
   the decision to stop; it is never delegated to a reviewer.
 
 So **do not collapse three rounds into one K×3-reviewer fan-out.** That buys
@@ -233,6 +233,48 @@ genuine regression of a fixed one."* A round is **CLEAN when it surfaces no new
 open finding**; a re-report of a `wontfix`, or of a `fixed` item that is still
 fixed, is not new and does not reset the streak. The ledger doubles as the
 round-by-round evidence §7 asks you to surface.
+
+#### CLEAN is severity-defined, not zero-findings
+
+Whether a finding is **open** is decided by its **severity** — this is *how* the
+ledger's open/dispositioned split gets made, not a competing definition of CLEAN.
+**Tag every finding `blocker` · `major` · `minor`.** Then:
+
+- A **blocker or major** is an `open` finding: it *needs* changing, so it **FAILs
+  the round and resets the streak** until fixed.
+- A **minor** is **dispositioned by the agent running the gate** — *accept* (note it and move on),
+  *defer to BACKLOG* (a stable-ID item for later), or *fold in* (fix it now) —
+  and the chosen disposition moves it to `fixed`/`wontfix` in the ledger. A
+  dispositioned minor is **not** an open finding and does **not**, by itself,
+  reset the streak.
+
+So a **CLEAN** round is one with **no new open (blocker/major) finding** — *not*
+one with zero findings of any kind. This matters because a genuinely adversarial
+reviewer almost always surfaces *some* minor nit; defining CLEAN as
+zero-findings means the streak never reaches two-consecutive and the gate loops
+forever, burning effort. The **agent running the gate dispositions minors and owns the verdict.**
+When the **blocker/major count is trending to zero while only minors linger**,
+that is the signal to **disposition the minors and converge** — not to spin
+another round chasing nits.
+
+### A fix is itself a new change
+
+Between rounds, the fixer applies fixes — and **each fix is a fresh, unreviewed
+change.** Two things must happen before the next round can come back clean:
+
+1. **Re-verify the fix against the source of truth.** A fix can be wrong, or can
+   break a caller (the round 3 → FAIL in the §3 worked example is exactly this).
+   Confirm it actually holds against the live code, not against the intent.
+2. **Re-grep the *whole* doc funnel for the corrected fact.** A fixer scoped to
+   only the flagged file leaves sibling artifacts carrying the same now-wrong
+   fact — the same value lives in, or is referenced from, more than one place.
+   Search every occurrence and reconcile them (the one-canonical-location
+   discipline, [`02-RITUALS.md`](02-RITUALS.md) Ritual 14 / 5). Fixing one copy
+   while a stale twin survives is how a "fixed" finding silently regresses two
+   rounds later.
+
+This is why a FAIL **resets the streak**: the change a fix introduces has not yet
+survived a clean round of its own.
 
 ### Verify citations against live code
 
@@ -269,10 +311,14 @@ FLOOR      = min 3 rounds, always
 GROUNDWORK = the 1st round does NOT count toward exit (even if clean)
 EXIT       = floor met AND last two rounds both CLEAN (consecutive)
 NOT EXIT   = a single clean after a fail; two clean before the floor
+CLEAN      = no NEW OPEN finding — blocker/major only; minors are dispositioned
+             by the agent (accept/defer/fold-in), NOT zero-findings-of-any-kind
+FIX        = itself a new change → re-verify vs live code + re-grep the funnel
+             for the corrected fact before the round counts clean
 PARALLEL   = K reviewers WITHIN a round (distinct lenses, same snapshot);
              rounds stay serial — never collapse N rounds into one fan-out
-LEDGER     = findings tracked open·fixed·wontfix; each reviewer reports only
-             NEW findings → the parallel loop converges instead of oscillating
+LEDGER     = findings tracked open·fixed·wontfix + severity; each reviewer reports
+             only NEW findings → the parallel loop converges instead of oscillating
 LIGHT GATE = 1 coherence pass per artifact, inline, by the author  → feeds →
 HEAVY GATE = full cadence, fresh-context reviewers, before any seal/reset
 LENSES     = correct·relevant·plausible·well-specified·well-formed

@@ -141,6 +141,22 @@ Playbook:
 
 ---
 
+## Ritual 15 — Housekeeping adjudication
+
+**Goal:** an *agent-originated* destructive chore gets **one** bounded adversarial pass before it runs; the orchestrator decides; the owner is the only escalation.
+
+> **Trigger is objective, not vibes.** Run the pass before the action if it does **any** of: deletes/force-overwrites a **tracked file or git ref** (branch/tag/remote); mutates **committed config** (`.gitignore`, `.claude/settings.json`, CI, infra manifests) or any version-controlled file **outside the current task's diff**; reaches **outside the task's worktree** (another branch/worktree, global git config); or **cannot be undone by a single inverse command you can write out in advance**. A chore tripping **none** of these — and **any** chore the **owner explicitly asked for** — is exempt: just do it.
+
+Playbook:
+1. Spawn **one** fresh Agent-tool subagent as an adversarial reviewer. Give it the exact action, the objective trigger(s) it tripped, and the one-line undo you intend (or "no clean undo" if there isn't one).
+2. The subagent returns a **verdict + the single strongest counter-argument** — not a fix, not a second opinion to average.
+3. **The orchestrator (main thread) decides** from that verdict. Proceed, adjust, or abandon the chore.
+4. **One pass, then decide — never a second reviewer round.** Two no-authority reviewers only manufacture a consensus the orchestrator would override. If the single pass is genuinely inconclusive, **escalate to the owner**, not to another subagent.
+
+> Why a *single* bounded pass: this is Principle 11 (*challenge — adversarially, and bound it*) applied to janitorial actions — enough rigor to catch a one-way mistake (a force-deleted ref, a clobbered shared config), bounded so the gate stays cheap and loop-free. Any fix the verdict produces still obeys single-writer discipline (ritual 13).
+
+---
+
 ## Skills
 
 Wrap any ritual you run often as a **Skill** (e.g. a "run completion audit" skill that spawns the round-1 subagent with the right prompt). Skills make the procedure invokable on demand and keep the prompt consistent across sessions.

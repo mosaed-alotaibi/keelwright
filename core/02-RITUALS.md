@@ -48,6 +48,7 @@ the bar itself is principle #2 ("Harden, don't defer") in
 | 13 | Parallel-work synchronization | Read-only fan-out is free; parallel writers only on disjoint files; shared-hub edits and rituals are single-writer. |
 | 14 | Documentation model & anti-drift | Funnel + stable IDs + one canonical location per item. (See `01-DOC-MODEL.md`.) |
 | 15 | Housekeeping adjudication | *Agent-originated* cleanup that deletes a tracked file/git-ref, mutates committed config, reaches outside the task's diff, or isn't undoable by one named command gets **one** fresh adversarial pass before acting; owner-requested chores are exempt; one pass then the orchestrator decides — escalate to the owner, never a second reviewer round. |
+| 16 | Dependency-reality check | Before designing against an unfamiliar / fast-moving / post-knowledge-cutoff dependency, verify its *real* behavior against the **installed package's** source/types — error & return semantics, exact export paths, which helper wraps which behavior, current CLI/version — pin the exact version, and treat a fast release cadence as a standing patch obligation. Designing from priors yields plausible-but-wrong config. |
 
 ---
 
@@ -70,6 +71,26 @@ handing off, resetting/clearing context, or any "we're done" milestone.
    groundwork and does **not** count toward the exit. A round that finds a gap is
    a *fail*: fix it, then continue — a fix **resets the streak** (the two clean
    rounds must be consecutive). Earliest possible stop is round 3.
+
+**A passed task/artifact gate is NOT a sealed completion.** Clearing the
+per-artifact coherence pass (Ritual 5) or a convergence cadence (Ritual 8) on the
+*work itself* does not make it "done" — "done" is earned only by **this**
+multi-round completion sweep over the whole change *and its hand-off*, run
+**proactively** before any done/seal/merge/hand-off/context-reset. Task momentum
+makes this the easy step to skip ("the plan converged, surely we're finished") —
+that is exactly when to run it. Per-artifact reviews **feed** the completion
+ritual; they never **substitute** for it.
+
+**Inbound claims get the same evidence bar as your own.** A defect or risk claim
+you *receive* — from a person, a tool's output, or another agent — is verified
+against the live code with **concrete file-and-line evidence before you act on
+it**, exactly as you would verify a "done" you're about to assert. Acting on an
+unverified report is the inbound twin of asserting an unverified "done". And
+**refuting the headline is not the end of the check**: when the literal claim
+doesn't hold, identify the **adjacent config or layer the reporter may actually
+mean** — a reporter who names the wrong file often still smelled a real problem
+one layer over, and that neighbour is frequently the true exposure. Disprove the
+exact words, then confirm the neighbourhood is clean too before closing it.
 
 **How to apply.**
 - Run each round as a **fresh independent reviewer with no memory of the work.**
@@ -199,6 +220,12 @@ artifact async, for visibility — not as an approval you block on.
 surface them if they need a decision), then proceed:
 - **Drift vs reality** — every file / line / function / anchor the artifact cites
   still exists and matches the live code. Re-check; don't trust memory.
+- **Premise vs reality** — every *existing-behavior* premise the artifact builds
+  on is re-verified against the live code, not taken on its label. A feature
+  called "dead" / "mock" / "redundant", an assumed test harness, a "current
+  state" inherited from a catalog or a prior note — each is a **hypothesis to
+  confirm, not a fact**. Designing on top of an unchecked premise propagates the
+  error into everything downstream; confirm the premise before you rely on it.
 - **Backward-compat** — no change breaks an existing caller, test, env default,
   or contract; new config has safe defaults; a signature/return-type change has
   *every* call site accounted for.
@@ -209,6 +236,16 @@ surface them if they need a decision), then proceed:
 - **Docs + notes currency** — nothing in docs or durable notes is now stale or
   contradicted; sweep the front-door docs for stale "active phase" / resume
   pointers so a fresh reader lands on the *current* phase.
+
+**A fix is itself a new change.** When this pass surfaces something and you fix
+it, the fix is a fresh edit that has not yet been reviewed — so **re-verify the
+fix against the source of truth** before treating the pass as clean, and
+**re-sweep the whole doc funnel for the corrected fact.** A fixer scoped to only
+the flagged file silently leaves sibling artifacts carrying the same now-wrong
+fact (one-canonical-location, Ritual 14): the same value lives in — or is
+referenced from — more than one place, and correcting one instance creates drift
+unless you re-grep for *every* occurrence and reconcile them. Fix → re-verify →
+re-grep, then the round may count clean.
 
 **Why.** This is the **light early-catch gate**: it catches issues at the
 artifact that introduced them (a stale anchor, an unchecked caller, a
@@ -530,6 +567,57 @@ before irreversible ops) into an objective trigger set plus a bounded adversaria
 pass; the single-writer discipline of Ritual 13 still governs any fix the verdict
 produces. The bounded-self-challenge stance behind it is principle #11 in
 [`00-PHILOSOPHY.md`](00-PHILOSOPHY.md).
+
+---
+
+## 16. Dependency-reality check
+
+**Trigger:** before designing or building against any dependency whose real
+behavior you have not just confirmed — most acutely an **unfamiliar**, a
+**fast-moving**, or a **post-knowledge-cutoff** one (a library, framework, SDK,
+CLI, or external API you're integrating).
+
+**The rule.** Verify the dependency's **actual** behavior against the **installed
+package's own source and type definitions** — not prose docs, not a blog, and
+above all not your priors. Documentation lags the code; your training is a
+snapshot that a fast release cadence has already moved past. The truth is in the
+artifact you actually depend on. In particular, confirm against the installed
+version:
+- **Error & return semantics** — what it throws vs. returns, the shape of each,
+  the failure modes you must handle.
+- **Exact export / import paths** — the real module path of every symbol you
+  import (priors routinely guess a path that moved or never existed).
+- **Which helper wraps which behavior** — when several helpers look
+  interchangeable, which one actually does the thing you need.
+- **Current CLI / API surface and version** — flags, subcommands, and signatures
+  for the version you have installed, not an older or newer one.
+
+Then **pin the exact version** you verified against, and treat a **fast release
+cadence as a standing patch obligation**: a dependency that ships often will drift
+from your verified snapshot, so re-checking it is recurring maintenance, not a
+one-time gate.
+
+**How to apply.**
+- Read the **installed** source/types (in the dependency tree on disk), or the
+  release notes / changelog for the **exact** installed version — not the latest
+  docs site, which may describe a different version than you have.
+- When a design decision rests on "the dependency does X," cite **where** in the
+  installed package you confirmed X. An unconfirmed "it does X" is a premise to
+  verify (Ritual 5, *Premise vs reality*), not a fact to build on.
+- If you cannot confirm a behavior from the source, write a tiny probe that
+  exercises it and observe the real result — don't assume.
+
+**Distinct from Ritual 11.** Ritual 11 (external-dependency feedback) is about
+*influencing the owner* of a component you **cannot change**, once a session, by
+logging friction. This ritual is **design-time correctness** against **any**
+dependency — changeable or not — *before* you build on it. One looks outward to
+report; this one looks inward to verify.
+
+**Relationship.** Feeds Ritual 5 (a dependency premise is one of the premises the
+coherence pass re-verifies) and Ritual 2 (a probe that confirms real dependency
+behavior is the same evidence-over-priors discipline tests embody). Designing from
+priors alone yields config that is plausible but wrong — exactly the class of
+defect the early gates exist to catch before it reaches the completion ritual.
 
 ---
 

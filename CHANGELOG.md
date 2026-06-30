@@ -8,6 +8,20 @@ All notable changes to Keel are recorded here. Format loosely follows
 
 ### Added
 
+- **`core/02-RITUALS.md` — Ritual 16: Dependency-reality check.** Before designing
+  against an unfamiliar / fast-moving / post-knowledge-cutoff dependency, verify its
+  *real* behavior against the **installed package's** source/types — error & return
+  semantics, exact export paths, which helper wraps which behavior, current CLI/version
+  — pin the exact version, and treat a fast release cadence as a standing patch
+  obligation. Designing from priors yields plausible-but-wrong config. Distinct from
+  Ritual 11 (influence a dependency you *can't* change); this is design-time correctness
+  against *any* dependency, and it feeds Rituals 5 and 2. Added to the "Rituals at a
+  glance" table and the `PROJECT_RULES.md.tmpl` adopted-ritual list; glossary entry added.
+- **`adapters/claude-code/` — Ritual 15 (Housekeeping adjudication) mapped to its CC
+  mechanism.** New row in the adapter `README` ritual table and a `## Ritual 15` playbook
+  in `rules/RITUALS-IN-CLAUDE-CODE.md`: spawn **one** bounded adversarial-pass subagent
+  before agent-originated destructive cleanup; the orchestrator decides; escalate to the
+  owner if inconclusive, never a second round. The bounded single pass is Principle 11.
 - **`core/02-RITUALS.md` — Ritual 15: Housekeeping adjudication.** *Agent-originated*
   cleanup that deletes a tracked file/git-ref, mutates committed config, reaches
   outside the current task's diff/worktree, or isn't undoable by one named command
@@ -28,6 +42,32 @@ All notable changes to Keel are recorded here. Format loosely follows
 
 ### Changed
 
+- **`core/02-RITUALS.md` — Ritual 1 (completion ritual)** sharpened with two
+  bolded clarifications: (a) **a passed task/artifact gate is NOT a sealed
+  completion** — "done" is earned only by the multi-round completion sweep, run
+  proactively before any done/seal/hand-off/reset; per-artifact reviews *feed* it,
+  never *substitute* for it; (b) **inbound claims get the same evidence bar as your
+  own** — a defect/risk claim you *receive* is verified against live code with
+  file-and-line evidence before acting, and refuting the headline isn't the end:
+  check the adjacent config/layer the reporter may actually mean (often the true
+  exposure).
+- **`core/02-RITUALS.md` — Ritual 5 (coherence pass)** gained a **Premise vs
+  reality** lens (every "existing behavior" premise — a feature labelled
+  dead/mock/redundant, an assumed harness, an inherited "current state" — is
+  re-verified against live code; a label is a hypothesis, not a fact) and a **"a
+  fix is itself a new change"** note (after a gate-driven fix, re-verify it against
+  the source of truth *and* re-grep the whole doc funnel for the corrected fact, so
+  a sibling artifact doesn't keep carrying the now-wrong value).
+- **`core/03-REVIEW-GATES.md` — CLEAN is severity-defined, not zero-findings.**
+  The findings-ledger subsection now defines how a finding becomes open-vs-
+  dispositioned: tag every finding `blocker · major · minor`; a blocker/major is an
+  open finding that FAILs the round and resets the streak, a minor is dispositioned
+  by the agent running the gate (accept / defer to BACKLOG / fold in) and does not by itself reset
+  it — so a CLEAN round is "no new *open* finding," not "zero findings." Unifies
+  with the existing "no new open finding" rule (severity is *how* a finding becomes
+  open). Also adds **"A fix is itself a new change"** (re-verify the fix vs live
+  code + re-grep the funnel for the corrected fact before the round counts clean)
+  and refreshes the §8 quick reference (`CLEAN`, `FIX`, severity in `LEDGER`).
 - **`core/03-REVIEW-GATES.md`** — made the review-gate engine safe to run as a
   *parallel swarm* without weakening the cadence:
   - New **"Breadth within a round, depth across rounds"** — parallelism is K
