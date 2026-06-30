@@ -78,6 +78,14 @@ exit still apply across rounds.
 > that is the Orchestrator's signal to disposition the minors and call convergence — not to
 > spin another round.
 
+> **Reconciliation with core's findings ledger.** An undisposed minor is still an `open`
+> finding in the [`03-REVIEW-GATES.md`](../../../core/03-REVIEW-GATES.md) *findings ledger*;
+> the Orchestrator's disposition (accept / defer to BACKLOG / fold in) moves it to `fixed` /
+> `wontfix`, so the round is CLEAN by core's "no **new open** finding" rule. The severity cut
+> here is the Orchestrator's *disposition heuristic*, not a second definition of CLEAN —
+> blocker/major ⇒ a fix is required (reset the streak); minor ⇒ disposition it into the ledger.
+> Same gate, one CLEAN.
+
 ### Preserving the consecutive-clean streak
 
 The Orchestrator runs rounds **strictly ordered** and holds the only counter:

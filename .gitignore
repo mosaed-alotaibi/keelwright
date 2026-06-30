@@ -16,8 +16,8 @@ pnpm-debug.log*
 *.keel.tmp.*
 
 # --- Keel-managed state in a CONSUMING project (kept out of the framework repo) ---
-# init.sh writes these into a target project, not here; ignored defensively.
-.keel/snapshots/
+# The SessionEnd hook writes memory snapshots into a target project, not here; ignored defensively.
+.harness/memory-snapshots/
 
 # --- env / secrets (never commit) ---
 .env
