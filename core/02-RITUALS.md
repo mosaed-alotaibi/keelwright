@@ -47,6 +47,7 @@ the bar itself is principle #2 ("Harden, don't defer") in
 | 12 | Lessons-learned capture | At session end, append Issue / Mitigation / Lesson one-liners to a dated log; "nothing notable" is a valid pass. |
 | 13 | Parallel-work synchronization | Read-only fan-out is free; parallel writers only on disjoint files; shared-hub edits and rituals are single-writer. |
 | 14 | Documentation model & anti-drift | Funnel + stable IDs + one canonical location per item. (See `01-DOC-MODEL.md`.) |
+| 15 | Housekeeping adjudication | *Agent-originated* cleanup that deletes a tracked file/git-ref, mutates committed config, reaches outside the task's diff, or isn't undoable by one named command gets **one** fresh adversarial pass before acting; owner-requested chores are exempt; one pass then the orchestrator decides — escalate to the owner, never a second reviewer round. |
 
 ---
 
@@ -485,6 +486,50 @@ disjoint.
 **Relationship.** Complements Ritual 4 (don't hand-curate the tool-owned backlog;
 your own backlog doc is the counterpart you control) and Ritual 10 (state-change
 currency keeps the canonical locations current).
+
+---
+
+## 15. Housekeeping adjudication
+
+**Trigger:** before acting on *agent-originated* housekeeping — cleanup the agent
+proposes on its own (remove a worktree/branch/scratch dir, prune files, "while I'm
+here" tidying) — **not** a chore the owner explicitly asked for.
+
+**The rule.** The action gets **one** fresh independent-reviewer adversarial pass
+**before** it happens if it trips **any** of these *objective* triggers:
+
+- deletes or force-overwrites a **tracked file** or a **git ref** (branch / tag /
+  remote ref);
+- mutates **shared or committed config** (`.gitignore`, settings, CI, infra
+  manifests) or any version-controlled file **outside the current task's diff**;
+- reaches **outside the current task's worktree/diff** (another branch or worktree,
+  global VCS config);
+- **cannot be undone by a single inverse command the agent writes out in advance**
+  (if it can't name the one-line undo, it is by definition not trivially reversible
+  → gate it).
+
+Chores that trip **none** of these — and **any** chore the **owner explicitly
+requested** (provenance carve-out) — are exempt: just do them. The reviewer returns
+a verdict plus the single strongest counter-argument, and **the orchestrator
+decides**. **One pass, then decide** — no multi-round reviewer debate (two reviewers
+with no authority only manufacture a consensus the orchestrator would override). If
+a single pass is genuinely inconclusive, **escalate to the owner**, never to a
+second reviewer round.
+
+**Why this exists.** Post-merge / post-task *janitorial* action sits in a seam the
+other gates miss: it is not a binding product decision (so the owner-veto of
+Ritual 8 / principle #5 doesn't fire) and it is not the artifact under verification
+(so the coherence/effectiveness audits don't fire) — yet a bad call (a force-deleted
+ref, a clobbered shared config) is expensive and one-way. The *objective* triggers
+deliberately replace a gameable "is it trivial?" self-judgment: the agent that wants
+to skip the gate must not be the one ruling the action trivial. The flat single pass
+keeps the gate cheap and loop-free.
+
+**Relationship.** Sharpens Ritual 3 / principle #8 (proactive-but-cautious; confirm
+before irreversible ops) into an objective trigger set plus a bounded adversarial
+pass; the single-writer discipline of Ritual 13 still governs any fix the verdict
+produces. The bounded-self-challenge stance behind it is principle #11 in
+[`00-PHILOSOPHY.md`](00-PHILOSOPHY.md).
 
 ---
 

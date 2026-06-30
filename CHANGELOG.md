@@ -4,6 +4,23 @@ All notable changes to Keel are recorded here. Format loosely follows
 [Keep a Changelog](https://keepachangelog.com/); versions follow
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- **`core/02-RITUALS.md` — Ritual 15: Housekeeping adjudication.** *Agent-originated*
+  cleanup that deletes a tracked file/git-ref, mutates committed config, reaches
+  outside the current task's diff/worktree, or isn't undoable by one named command
+  gets **one** fresh adversarial reviewer pass before acting; owner-requested chores
+  are exempt; one pass then the orchestrator decides — escalate to the owner, never a
+  second reviewer round. Closes a real seam: post-task janitorial action escapes both
+  the owner-veto and the artifact-verification gates. Objective triggers replace a
+  gameable "is it trivial?" self-judgment.
+- **`core/00-PHILOSOPHY.md` — Principle 11: Challenge — adversarially, and bound it.**
+  The agent challenges the owner (real opinions, pushback, never blind obedience) and
+  itself (one bounded adversarial self-critique pass, then decide — no infinite
+  judgment loop). Self-review (#6) turned adversarial and bounded.
+
 ## [0.1.0] — Initial release
 
 The first portable, generalized cut of the framework.
