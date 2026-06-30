@@ -147,6 +147,7 @@ Each round must judge through explicit lenses. Two families:
 |---|---|
 | **Drift vs live code** | Every file / line / function / anchor it cites still exists and matches reality. Re-check against the code — never from memory. |
 | **Backward-compat** | No change breaks an existing caller, test, default, or contract; new config has safe defaults; a signature change accounts for *every* call site. |
+| **Identifier-boundary footprint** | For a rename or split-identifier change, the *full* cross-boundary footprint is accounted for — redirects/routes, build/container files, CI, root scripts, and every consumer that filters on the old value — not just the definition site. An exact-match boundary breaks silently; a path-keyed tool can show clean while consumers break. |
 | **No placeholders** | Nothing deferred with a vague stub; concrete throughout. |
 | **Internal + cross-artifact consistency** | Names, types, decisions agree across design ↔ spec ↔ plan; every requirement maps to a task. |
 | **Docs + memory currency** | Nothing in the docs or durable notes is now stale or contradicted; the front-door / "start here" pointers route a fresh reader to the *current* state, not a finished one. |

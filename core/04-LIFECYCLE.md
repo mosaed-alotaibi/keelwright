@@ -161,6 +161,10 @@ context reset is safe at *any* moment.
 - Leave history alone — dated artifacts (archives, past specs/plans, "why" notes)
   describe past state and stay as written. Only *living* front-door docs and
   *current-state* notes get reconciled.
+- When a session's lesson is **cross-cutting** (it will recur in sibling tasks),
+  promote it from the dated lessons log into a standing **carry-forward
+  checklist** referenced at the cursor, so the next reader inherits the warning
+  rather than rediscovering it ([`02-RITUALS.md`](02-RITUALS.md) Ritual 12).
 
 See [`02-RITUALS.md`](02-RITUALS.md) (Ritual 9 — context budget & resume-safe
 handoff; Ritual 10 — state-change currency) for the hand-off contents and the
@@ -200,6 +204,7 @@ Standing constraints that ride along the whole loop, regardless of stage:
 | **Behavioral verification** | Verify at the real user-/system-facing surface. For anything with a visible or behavioral surface, render and check it live before claiming it works — don't claim from code-reading alone. Pure-internal changes verify by tests / queried state. |
 | **Don't break the foundation** | The green baseline is sacred; a change that regresses it is not done, however complete the feature looks. |
 | **Quick where safe, cautious where costly** | Read / inspect / build / test freely; trace the effect of every command before running it; confirm destructive or hard-to-reverse operations. |
+| **Provision before you reference** | Every *referenced* resource exists before the reference is evaluated. Treat an aggregated secret/config bundle as **all-or-nothing** — one missing key fails the whole unit and every consumer of it. Inject each value into the component that actually **consumes** it and confirm the consumer reads it. Keep a migration/bootstrap entrypoint depending on the **minimum** it needs, not the whole app config, so it can run before the full surface is provisioned. Provisioning order is hardening, not an afterthought. |
 | **Don't hand-curate tool-owned state** | Files a tool owns and regenerates (any tool-owned state directory) are not the hand-off — put the durable record where *you* own it (the docs, the plan, the commit log, the durable notes). |
 | **One canonical home per fact** | Each decision/item lives in exactly one authoritative doc; everything else references it. Stable IDs, never reused, so cross-references survive edits. |
 | **Hand-off stays current** | The cursor + durable notes are refreshed at every atomic-unit boundary so a reset is always safe. |

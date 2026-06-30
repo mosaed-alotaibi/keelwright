@@ -57,6 +57,14 @@ Requirements and milestones keep their identifiers for life.
 - *Why:* cross-references (Guardrail A) only survive if the thing they point to keeps its name. Renumbering silently breaks every reference.
 - *Rules:* IDs are assigned once and **never** reused or renumbered. A dropped item keeps its ID with status `dropped` — the ID is retired, not recycled. New items always take the next free number.
 
+> **Borrowed reference = mechanism, not identity.** When you build on a borrowed
+> reference implementation or scaffold, separate **mechanism** (the reusable
+> wiring — fair to adopt) from **identity and design** (anchor those on *this*
+> project's own artifacts, confirmed by version-control provenance — what *this*
+> repo's history shows, not what the source carried). An inherited naming prefix
+> carried along in shared scaffolding is a **non-signal**: never infer this
+> project's identity from a name it merely inherited.
+
 ---
 
 ## 3. Backlog schema
@@ -148,6 +156,7 @@ two ideas elsewhere in Keel:
 
 - **State-change currency** ([`02-RITUALS.md`](02-RITUALS.md) §10): right after any action that changes durable state (a merge, a ship, a deferral, a branch), sweep the front-door docs and cross-session notes for claims the change just falsified, and fix them *before ending the turn*. Prefer **drift-proof phrasing** ("check the current state via `<command>`") over hardcoded facts that re-stale on the next change.
 - **Leave history alone:** dated artifacts — the archive, past specs/plans, "why" notes — describe *past* state and stay as-is. Only the *living* front-door docs and *current-state* notes get reconciled. History is a record, not a thing to keep current.
+- **Promote cross-cutting lessons:** a dated lessons-learned entry is history, but a lesson that will *recur* in sibling tasks gets promoted into a standing **carry-forward checklist** referenced at the NEXT-STEPS cursor, so the next reader inherits the warning ([`02-RITUALS.md`](02-RITUALS.md) Ritual 12). The dated entry stays; the checklist is the living copy.
 
 The test of a healthy doc model: **a cold reader, given only the front-door README,
 lands on the current cursor and nothing stale.** If they land on a shipped

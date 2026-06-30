@@ -229,6 +229,16 @@ surface them if they need a decision), then proceed:
 - **Backward-compat** — no change breaks an existing caller, test, env default,
   or contract; new config has safe defaults; a signature/return-type change has
   *every* call site accounted for.
+- **Identifier-boundary footprint** — for any **rename or split-identifier**
+  change (a value that splits into a "visible" and a "technical" form, or moves
+  namespace), enumerate the **full cross-boundary footprint**, not just the
+  obvious definition site: callbacks/redirects/routes, build/container files,
+  pipeline/CI config, root-level scripts, and every downstream consumer that
+  *filters on* the old value. Two traps make this silent: an **exact-match
+  boundary** (a redirect or route off by a single character) fails with no error,
+  and a **path-keyed tool** can report a clean lockfile while consumers built on
+  the old identifier quietly break. Grep every surface for both forms before
+  calling the rename complete.
 - **No placeholders** — no TBD/TODO/"handle errors"/vague steps; code steps show
   real code; commands show expected output.
 - **Internal + cross-artifact consistency** — types, names, and decisions agree
@@ -282,6 +292,10 @@ screen, the resulting record).
   it counts as complete.)
 - **Exempt:** pure-backend changes with no visible surface — verify by tests, an
   API call, or a data query instead.
+- **Catches what the harness can't.** A guarantee that a hermetic test harness
+  force-disables or cannot observe (origin/CSRF rejection, a top-level redirect,
+  cross-origin cookie behavior) gets its **end-to-end proof here** — the harness
+  only asserts the configuration (Ritual 7).
 
 **Why.** The visual/behavioral analogue of "evidence over claims" (Ritual 2):
 the rendered reality is frequently not the intended one — and a surface that works
@@ -312,6 +326,15 @@ its own — the audit's *conclusion* is the evidence.
   tested, not just the happy path. **Name the gaps** rather than hiding them.
 - **Honest, not gamed.** No result-gaming, no over-mocking that hides the very
   integration being claimed, no assertions weakened just to go green.
+- **Harness-unobservable guarantees → assert config, prove live.** Some
+  properties are **force-disabled or structurally unobservable** under a hermetic
+  test harness — e.g. origin/CSRF rejection, a top-level redirect, real
+  content-type handling, cross-origin cookie behavior. A green hermetic suite is
+  **not** evidence for a guarantee it cannot exercise. For each such property,
+  split the proof: assert the **configuration** in the harness (the flag is set,
+  the trusted list is exactly right), and explicitly route the **end-to-end
+  proof to live verification (Ritual 6)**. Naming which guarantees are
+  harness-unobservable is itself part of this audit.
 - **Reasonable cost.** Not flaky, not redundant; fast where it can be;
   deterministic.
 
@@ -470,6 +493,15 @@ it **concise, precise, direct — no fluff.**
 - **If nothing notable surfaced** → the pass **passes**: note "no notable issues"
   or skip. Do **not** manufacture entries.
 
+**Promote the cross-cutting ones.** A lesson that is **cross-cutting** — it will
+recur in sibling tasks, not a one-off — does more good as a *standing warning*
+than as a dated log entry the next task never reads. When a lesson is
+cross-cutting, **promote** it from the dated session log into a standing
+**carry-forward checklist** referenced at the **resume cursor** (NEXT-STEPS), so
+the next task **inherits** the warning instead of rediscovering it the hard way.
+The dated entry stays as history; the carry-forward checklist is the *living*
+copy a fresh context reads first. (A one-off lesson stays in the log only.)
+
 **How to apply.** Run this **inline**, by the actor who lived the session (the
 friction is in *this* context). It does **not** gate a reset; a clean pass is
 fine. Index the entries so the log is navigable. A template lives at
@@ -490,7 +522,11 @@ the next environment and the next engineer.
 - **Read-only exploration → parallel is free.** Many read-only workers may sweep
   the codebase at once — no shared mutable state.
 - **Implementation → parallel ONLY on disjoint files.** Two writing workers may
-  run at once **only** when their file sets do not overlap.
+  run at once **only** when their file sets do not overlap. Before dispatching,
+  enumerate each task's **entire** file footprint — not just its "primary" file
+  (a task also touches its imports, shared config, an index, a doc). If two
+  footprints *might* touch the same file, **serialize** those tasks. A clean
+  merge from overlapping edits is luck, not safety.
 - **Shared-hub edits → serialize.** Where edits converge on a shared "hub" file
   (a large component or module most tasks touch), they run **one writer at a
   time.**

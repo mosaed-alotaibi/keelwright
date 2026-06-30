@@ -42,6 +42,45 @@ All notable changes to Keel are recorded here. Format loosely follows
 
 ### Changed
 
+- **`core/02-RITUALS.md` — Ritual 5 (coherence pass)** gained an
+  **Identifier-boundary footprint** lens: for a rename or split-identifier
+  change, enumerate the *full* cross-boundary footprint — redirects/routes,
+  build/container files, CI, root scripts, every consumer that filters on the old
+  value — not just the definition site; an exact-match boundary breaks silently
+  and a path-keyed tool can show clean while consumers break. Mirrored as a lens
+  row in `core/03-REVIEW-GATES.md` §5; glossary entry added.
+- **`core/02-RITUALS.md` — Ritual 7 (test-effectiveness)** gained a
+  **harness-unobservable guarantees** lens: properties a hermetic harness
+  force-disables or cannot observe (origin/CSRF rejection, a top-level redirect,
+  real content-type handling, cross-origin cookies) get their *configuration*
+  asserted in tests while the *end-to-end* proof is explicitly routed to live
+  verification (Ritual 6) — a green hermetic suite is not evidence for a
+  guarantee it structurally cannot exercise. A one-line cross-reference was added
+  to Ritual 6.
+- **`core/02-RITUALS.md` — Ritual 12 (lessons-learned capture)** gained a
+  **promotion step**: a cross-cutting lesson (one that will recur in sibling
+  tasks) is promoted from the dated session log into a standing **carry-forward
+  checklist** referenced at the NEXT-STEPS resume cursor, so the next task
+  inherits the warning instead of rediscovering it. Promotion path also noted in
+  `core/01-DOC-MODEL.md` §7 and `core/04-LIFECYCLE.md` §5; glossary entry added.
+- **`core/02-RITUALS.md` — Ritual 13 (parallel-work synchronization)** sharpened
+  the "disjoint files only" rule: before dispatching parallel writers, enumerate
+  each task's *entire* file footprint (not just its "primary" file), and
+  serialize any two whose footprints might touch the same file — a clean merge
+  from overlapping edits is luck, not safety.
+- **`core/04-LIFECYCLE.md` §6 (Guardrails)** — new **Provision before you
+  reference** guardrail: every referenced resource exists before its reference is
+  evaluated; an aggregated secret/config bundle is all-or-nothing (one missing
+  key fails the whole unit and every consumer); each value is injected into the
+  component that actually consumes it; a migration/bootstrap entrypoint depends
+  on the minimum, not the whole app config. Provisioning order is hardening, not
+  an afterthought — nodded to under `core/00-PHILOSOPHY.md` Principle 2.
+- **`core/01-DOC-MODEL.md` §2** — new **borrowed reference = mechanism, not
+  identity** clause near the stable-ID / provenance guardrail: when building on a
+  borrowed reference implementation or scaffold, separate reusable *mechanism*
+  from *identity/design* (anchored on this project's own artifacts and
+  version-control provenance); an inherited naming prefix carried in shared
+  scaffolding is a non-signal — never infer identity from it.
 - **`core/02-RITUALS.md` — Ritual 1 (completion ritual)** sharpened with two
   bolded clarifications: (a) **a passed task/artifact gate is NOT a sealed
   completion** — "done" is earned only by the multi-round completion sweep, run
