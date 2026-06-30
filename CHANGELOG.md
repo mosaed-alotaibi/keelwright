@@ -6,6 +6,8 @@ All notable changes to Keel are recorded here. Format loosely follows
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-06-30
+
 ### Added
 
 - **`core/02-RITUALS.md` — Ritual 16: Dependency-reality check.** Before designing
@@ -201,4 +203,5 @@ The first portable, generalized cut of the framework.
   filled-in Keel docs look like end to end.
 - Repo glue: `README.md`, `LICENSE` (MIT), `.gitignore`, this changelog.
 
+[0.2.0]: #020--2026-06-30
 [0.1.0]: #010--initial-release
