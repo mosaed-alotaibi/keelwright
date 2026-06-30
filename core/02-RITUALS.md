@@ -315,6 +315,14 @@ screen, the resulting record).
   force-disables or cannot observe (origin/CSRF rejection, a top-level redirect,
   cross-origin cookie behavior) gets its **end-to-end proof here** — the harness
   only asserts the configuration (Ritual 7).
+- **Prove the value/state actually in effect — don't trust on-disk or assumed.**
+  When you change configuration a process reads **at startup**, **restart the
+  process** before verifying: hot-reload of *source* does not reload *startup
+  config*, so confirm the new value is genuinely in effect, not merely saved to
+  disk. And when a failure could stem from a **placeholder / example value**
+  rather than a genuine error (a copied example secret fails *identically* to an
+  expired or wrong one), **fingerprint the actual value in use** — e.g. its length
+  and first characters against the known-good source — before diagnosing.
 
 **Why.** The visual/behavioral analogue of "evidence over claims" (Ritual 2):
 the rendered reality is frequently not the intended one — and a surface that works
@@ -355,7 +363,10 @@ its own — the audit's *conclusion* is the evidence.
   proof to live verification (Ritual 6)**. Naming which guarantees are
   harness-unobservable is itself part of this audit.
 - **Reasonable cost.** Not flaky, not redundant; fast where it can be;
-  deterministic.
+  deterministic. Tests that mutate **shared state against a single live datastore**
+  must be **serialized**, not run under blanket file-parallelism (the race erodes
+  the green signal); and scope module-load-time env **per test file** so a global
+  default can't poison a negative-path test.
 
 Weak / vacuous / missing tests are fixed inline or logged as named gaps.
 

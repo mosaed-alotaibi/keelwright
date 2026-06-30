@@ -129,6 +129,8 @@ Playbook:
 
 > [`GATED-SWARM.md`](GATED-SWARM.md) §1–§2, §6 turns this taxonomy into an operating model: the Orchestrator is the single writer for the funnel/memory/streak; Workers are read-only auditors or disjoint-file implementers that *return* content and never touch a shared hub.
 
+**Git hygiene when subagents leave a dirty tree.** Delegated subagents and verification steps can leave stray files in the working tree, so **stage explicitly** — name the files you mean to commit rather than blanket `git add -A`, which sweeps in their artifacts. Have verification/audit helpers write to a temp dir **outside the repo** so nothing lands in the tree to begin with. And **re-confirm staging after a mixed delete + edit**: a staged deletion does not pull in an unstaged sibling edit — check `git status` before committing.
+
 ---
 
 ## Ritual 14 — Doc model & anti-drift

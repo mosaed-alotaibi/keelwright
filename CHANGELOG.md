@@ -42,6 +42,25 @@ All notable changes to Keel are recorded here. Format loosely follows
 
 ### Changed
 
+- **`core/02-RITUALS.md` — Ritual 6 (live verification)** gained a **"prove the
+  value/state actually in effect — don't trust on-disk or assumed"** caveat:
+  restart a process before verifying config it reads **at startup** (hot-reload of
+  *source* doesn't reload *startup config*), and when a failure could come from a
+  **placeholder / example value** rather than a genuine error, fingerprint the
+  actual value in use (length + first chars vs the known-good source) before
+  diagnosing — a copied example secret fails identically to a wrong/expired one.
+- **`core/02-RITUALS.md` — Ritual 7 (test-effectiveness)** sharpened the
+  **"reasonable cost / not flaky"** lens: tests that mutate **shared state against
+  a single live datastore** must be **serialized**, not run under blanket
+  file-parallelism (the race erodes the green signal); and scope module-load-time
+  env **per test file** so a global default can't poison a negative-path test.
+- **`adapters/claude-code/rules/RITUALS-IN-CLAUDE-CODE.md` — Ritual 13 section**
+  gained an explicit-staging git-hygiene note: when subagents/verification steps
+  may have dirtied the tree, **stage explicitly** (name the files) instead of
+  blanket `git add -A`; point verification/audit helpers at a temp dir **outside
+  the repo**; and **re-confirm staging after a mixed delete + edit** (a staged
+  deletion doesn't pull in an unstaged sibling edit). Kept in the adapter as a
+  tool-mechanic, not in `core/`.
 - **`core/02-RITUALS.md` — Ritual 5 (coherence pass)** gained a
   **Constraint-vs-behavior joint-satisfiability** lens: when an artifact settles
   *both* a hard constraint ("component / file X is off-limits / unchanged") and a
