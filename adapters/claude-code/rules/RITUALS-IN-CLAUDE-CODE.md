@@ -8,13 +8,13 @@ The Keelwright rituals are defined tool-agnostically in [`../../../core/02-RITUA
 
 ## Ritual 1 — Completion / pre-clear audit
 
-**Goal:** ≥2 *consecutive* clean audit rounds before any "we're done" milestone or `/clear`.
+**Goal:** ≥2 *consecutive* clean audit rounds before any "we're done" milestone or `/clear` (from round 6 onward, one clean round exits — the relief valve).
 
 Playbook:
 1. Spawn a **fresh Agent-tool subagent** as auditor. Give it the artifacts + the acceptance criteria; do **not** tell it prior verdicts.
 2. The subagent genuinely re-audits — drift, gaps, broken claims, leakage — and returns findings.
 3. If findings → fix → start the count over. If clean → that's round *N* clean.
-4. Repeat with a **new** subagent each round (fresh context, no rubber-stamping). Exit only on 2 consecutive clean.
+4. Repeat with a **new** subagent each round (fresh context, no rubber-stamping). Exit only on 2 consecutive clean — or, from round 6 onward, on any single clean round (the relief valve, core `03-REVIEW-GATES.md` §2 (rule 5)).
 5. For breadth, run ≥3 subagent rounds across the surface; a single pass is not an audit.
 
 > The 1st pass is foundational and uncounted — it establishes the baseline. Count clean rounds *after* it.
@@ -58,7 +58,7 @@ Playbook:
 
 ## Ritual 8 — Review gate (assistant-owned)
 
-**Goal:** the assistant reviews its own spec / plan / execution-approach. Min 3 iterations; exit on 2 consecutive clean (1st pass foundational, uncounted). Execution is automated; the human delegates and spot-checks via ritual 1.
+**Goal:** the assistant reviews its own spec / plan / execution-approach. Min 3 iterations; exit on 2 consecutive clean (1st pass foundational, uncounted; round-6 relief: one clean exits from round 6 on). Execution is automated; the human delegates and spot-checks via ritual 1.
 
 Playbook — pick the shape:
 
@@ -68,7 +68,7 @@ Playbook — pick the shape:
 | Decomposable fan-out — judge panel scoring one artifact, adversarial verify, loop-until-converged | The **Workflow tool**. |
 | Producing the artifact itself | **Subagent-driven**: one subagent drafts, another critiques, you reconcile. |
 
-Loop-until-converged with the Workflow tool: define the artifact, the critique rubric, and the exit condition (2 consecutive clean). Let it iterate; you own the final verdict.
+Loop-until-converged with the Workflow tool: define the artifact, the critique rubric, and the exit condition (2 consecutive clean; round-6 relief). Let it iterate; you own the final verdict.
 
 > Keep the streak loop in the **orchestrator** (the main thread), not inside the workflow: workers vote *within* a round; the orchestrator owns the round *sequence* and the EXIT. Concrete recipes + the per-phase barrier-vs-fan-out map: [`GATED-SWARM.md`](GATED-SWARM.md).
 
@@ -170,6 +170,21 @@ Playbook:
 - This is **disciplined design-time tool use, not orchestration** — no hook or special swarm is required (a subagent can do the read and hand you back the confirmed semantics). A dependency premise feeds the Ritual 5 coherence pass: when a design rests on "the dependency does X," cite **where** in the installed package you confirmed X.
 
 > Designing from priors alone yields config that is plausible but wrong — exactly the class of defect the early gates exist to catch before the completion ritual.
+
+---
+
+## Ritual 17 — Live eval bar for agent-behavioral surfaces
+
+**Goal:** never verify an LLM-decided surface (agent prompt, tools, model, middleware) with one good turn — verification is a **≥20-shot live eval suite** at **≥95% to pass**, graded against ground truth the agent cannot see.
+
+Playbook:
+- **Drive the real product path headlessly.** A thin driver script under project `scripts/` (Node/curl) that performs the *real* login (the exact flow a browser takes), opens a session, sends the shot over the product's own streaming API, and fetches the **persisted** answer back — so every shot also exercises persistence. Keelwright ships none (stacks vary); commit yours next to the eval set.
+- **Spawn the stack from the branch under test** (Bash): kill stale listeners on the app's ports first, then boot via the project's up-script. Never eval one build while another is serving.
+- **Pre-register the protocol in a committed file** — shot list with answer-key notes, grading tolerances, retry policy (ONE retry per turn-level malfunction; a shot that malfunctions twice fails) — *before* running. If the ground truth comes from generated data, re-derive the key after every regeneration.
+- **Grade with a Workflow fan-out:** one grader agent per shot (it re-derives every fact with its own direct datastore queries — use labels the product strips from the agent's view as hidden ground truth), then one **adversarial skeptic** per verdict trying to overturn it, a tiebreaker on disagreement. `pipeline(shots, grade, verify)`.
+- **Report score vs the bar with per-shot evidence** (streamed vs persisted output, tool calls, event traces) so failures are **attributed to a layer** — agent prompt, model, middleware, or app — and cluster into backlog items, not vibes.
+
+> One good turn is a sample from a distribution. Only shot counts expose failure *rates* and failure *clusters* (wrong-date grounding, fabrication after tool errors, truncated final turns) that a single hand-picked pass structurally cannot see.
 
 ---
 

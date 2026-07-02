@@ -51,9 +51,9 @@ Keelwright closes that gap with four moving parts:
 | Part | What it does | Where it lives |
 |---|---|---|
 | **The loop** | Every change runs through `brainstorm → spec → plan → execute → verify → seal`. | [`core/04-LIFECYCLE.md`](core/04-LIFECYCLE.md) |
-| **The gates** | A review must run *dry* before you stop: min 3 adversarial rounds, exit only on 2 consecutive clean. | [`core/03-REVIEW-GATES.md`](core/03-REVIEW-GATES.md) |
+| **The gates** | A review must run *dry* before you stop: min 3 adversarial rounds, exit on 2 consecutive clean (from round 6, one clean exits). | [`core/03-REVIEW-GATES.md`](core/03-REVIEW-GATES.md) |
 | **The funnel** | Docs flow `BACKLOG → ROADMAP → NEXT-STEPS → PRD`; each fact has exactly one home, so they can't drift. | [`core/01-DOC-MODEL.md`](core/01-DOC-MODEL.md) |
-| **The rituals** | 16 standing habits — completion, live-verification, anti-drift, lessons-learned, … | [`core/02-RITUALS.md`](core/02-RITUALS.md) |
+| **The rituals** | 17 standing habits — completion, live-verification, the agent-surface eval bar, anti-drift, lessons-learned, … | [`core/02-RITUALS.md`](core/02-RITUALS.md) |
 
 The principle under all of it, in one line: **quick where it's safe, cautious
 where mistakes cost real work — and never claim what you haven't shown.** The full
@@ -148,7 +148,8 @@ populated funnel for a toy URL shortener — the end state, before you build you
                                                       │
                                                       ▼
               COMPLETION RITUAL before every seal / context reset
-              (≥3 fresh-context audit rounds, exit on 2 consecutive clean)
+              (≥3 fresh-context audit rounds, exit on 2 consecutive clean;
+               round-6 relief: one clean exits)
 ```
 
 - **Convergence is approval.** When a gate runs dry, the artifact is approved *by

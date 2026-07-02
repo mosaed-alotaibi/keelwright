@@ -67,8 +67,9 @@ round(k):
 
 Each worker must re-verify citations against **live code this round**, **tag each finding's
 severity**, and state its lens coverage — a bare "looks good" is not a round (`§1`, `§6`).
-Breadth within a round is *not* depth over time: the floor of 3 and the two-*consecutive*-clean
-exit still apply across rounds.
+Breadth within a round is *not* depth over time: the floor of 3 still applies across rounds,
+and the two-*consecutive*-clean exit holds through round 5 (the round-6 relief valve is the
+only relaxation — see the pseudocode below).
 
 > **Convergence pitfall (learned in the field).** Do **not** define CLEAN as "zero findings
 > of any kind" — adversarial reviewers *always* surface a minor nit, so the streak never
@@ -98,9 +99,12 @@ for k = 1, 2, 3, …:
     if verdict == CLEAN: streak += 1
     else: streak = 0; apply fixes (single-writer); # next round runs vs post-fix state
     if k >= 3 and streak >= 2: EXIT  # floor met AND last two consecutive clean
+    if k >= 6 and verdict == CLEAN: EXIT  # relief valve — one clean exits from round 6 on
 ```
 
-A FAIL always resets the streak; a clean round after a fail never exits. Workers never see
+A FAIL always resets the streak; through round 5 a clean round after a fail never exits.
+From round 6 onward the relief valve opens (core `03-REVIEW-GATES.md` §2 (rule 5)): any single clean
+round converges — a FAIL at 6+ still needs one subsequent clean. Workers never see
 the streak or prior verdicts — that is what keeps each round honestly adversarial.
 
 ---
@@ -149,8 +153,10 @@ await pipeline(TASKS,
                 { label: `verify:${unit.id}`, schema: VERDICT }))
 ```
 
-**(c) Loop-until-converged** = the Orchestrator repeats recipe (a) until `streak >= 2 && k >= 3`.
-Keep the loop in the *orchestrator*, not the workflow, so the gate stays single-owned.
+**(c) Loop-until-converged** = the Orchestrator repeats recipe (a) until
+`(streak >= 2 && k >= 3) || (k >= 6 && verdict == CLEAN)` — the pair exit, or the round-6
+relief valve. Keep the loop in the *orchestrator*, not the workflow, so the gate stays
+single-owned.
 
 > Cost note: a round is N parallel reads — cheap and fast. The expense is depth (rounds over
 > time), which is exactly the thing the cadence *requires*. The swarm removes the wall-clock
@@ -181,7 +187,8 @@ ROLES      Orchestrator (1, owns streak/cursor/IDs/seal) + Workers (stateless: r
            verdict-blind auditors OR disjoint-file implementers)
 ROUND      = ONE parallel reviewer panel → collapse CONSERVATIVE (CLEAN iff all clean)
 SEQUENCE   rounds strictly ordered vs post-fix state; streak lives only in the Orchestrator
-EXIT       unchanged: floor ≥3 AND last two rounds consecutive clean (round 1 groundwork)
+EXIT       floor ≥3 AND last two rounds consecutive clean (round 1 groundwork)
+RELIEF     from round 6 onward, ONE clean round exits (a FAIL at 6+ needs a subsequent clean)
 FAN OUT    research · within-round audits · disjoint impl · surface checks
 NEVER FAN  the streak · the verdict · fix application · funnel/memory writes · owner-veto
 EVIDENCE   the Orchestrator re-shows same-turn behavioral proof for the whole; worker

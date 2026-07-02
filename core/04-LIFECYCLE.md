@@ -150,8 +150,8 @@ completion ritual is confirmation, not discovery.
 
 Before sealing a change (merge, ship, close) **or** before resetting / handing
 off the working context, run the **full heavy gate** ([`03-REVIEW-GATES.md`](03-REVIEW-GATES.md)):
-min 3 rounds, exit on 2 consecutive clean, each round an independent
-fresh-context audit.
+min 3 rounds, exit on 2 consecutive clean (round-6 relief: one clean exits from
+round 6 on), each round an independent fresh-context audit.
 
 **Every reset gets the full ritual — routine seam or milestone alike. No tiers,
 no exceptions.** The fresh-context reviewer is the truest test of whether the
@@ -172,7 +172,8 @@ The ritual's lenses, each round (vary the emphasis — [`03-REVIEW-GATES.md`](03
 
 The ritual is satisfied only when **≥3 rounds have run AND the last two are
 consecutive clean** (the first round is groundwork and does not count toward
-exit). Report each
+exit; from round 6 onward a single clean round satisfies it — the relief valve,
+[`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §2 (rule 5)). Report each
 round's findings transparently, then claim ready. An outer "are you sure?" is a
 spot-check that the rounds happened — never the trigger for them.
 

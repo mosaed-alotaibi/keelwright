@@ -36,7 +36,7 @@ business/technical claims and verify behavior at the surface. See
 ```markdown
 ---
 name: completion-ritual
-description: Two consecutive clean fresh-context audit rounds before any seal or context-clear.
+description: Two consecutive clean fresh-context audit rounds before any seal or context-clear (round-6 relief).
 metadata:
   node_type: memory
   type: feedback
@@ -47,7 +47,9 @@ completion ritual: spawn a fresh-context auditor (a new subagent, a second AI,
 or a different person) that does NOT know prior verdicts, and have it genuinely
 re-audit the work. Any finding resets the count. Exit only on TWO consecutive
 clean rounds, each with a fresh reviewer; the first pass is foundational and
-uncounted. Use multiple rounds for breadth — a single pass is not an audit.
+uncounted. From round 6 onward a single clean round exits (the relief valve; a
+fail at 6+ still needs one subsequent clean). Use multiple rounds for breadth —
+a single pass is not an audit.
 Pairs with [[evidence-over-claims]] and [[review-gate]].
 ```
 
@@ -58,7 +60,7 @@ Pairs with [[evidence-over-claims]] and [[review-gate]].
 ```markdown
 ---
 name: review-gate
-description: Self-review every spec/plan/approach; min 3 iterations, exit on 2 consecutive clean.
+description: Self-review every spec/plan/approach; min 3 iterations, exit on 2 consecutive clean (round-6 relief).
 metadata:
   node_type: memory
   type: feedback
@@ -66,7 +68,8 @@ metadata:
 
 The author owns the review of their own spec, plan, and execution approach —
 don't outsource judgment to the owner. Iterate at least 3 times; exit on 2
-consecutive clean passes (the 1st pass is foundational and uncounted). Use
+consecutive clean passes (the 1st pass is foundational and uncounted; from
+round 6 onward a single clean pass exits — the relief valve). Use
 fan-out for decomposable review (judge panel, adversarial verify,
 loop-until-converged) and a gated chain when steps depend on each other.
 Execution is automated once the gate is clean; the owner delegates and

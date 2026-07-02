@@ -39,8 +39,8 @@ Keelwright's `adapters/claude-code/rules/RITUALS-IN-CLAUDE-CODE.md`. In particul
      not inside this project — open it from your Keelwright copy. -->
 
 
-- **Before any "done" or `/clear`:** run the completion ritual — fresh audit subagents, ≥2 consecutive clean rounds.
-- **For any spec/plan/design you produce:** own the review gate (min 3 iterations, exit on 2 consecutive clean) and run one coherence pass.
+- **Before any "done" or `/clear`:** run the completion ritual — fresh audit subagents, ≥2 consecutive clean rounds (round-6 relief: one clean exits).
+- **For any spec/plan/design you produce:** own the review gate (min 3 iterations, exit on 2 consecutive clean; round-6 relief) and run one coherence pass.
 - **For any UI/behavioral surface:** verify live before claiming it works (headless-browser driver in `scripts/`).
 - **After any state change (push/merge/seal/branch):** reconcile the front-door docs + durable notes so the cursor is never stale.
 - **At session end:** append lessons-learned; keep the handoff current so `/clear` is always safe.

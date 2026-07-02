@@ -35,11 +35,11 @@ Canonical ritual definitions: [`../../core/02-RITUALS.md`](../../core/02-RITUALS
 
 | # | Ritual (core) | Claude Code mechanism |
 |---|---|---|
-| 1 | Completion / pre-clear audit | Spawn **fresh Agent-tool subagents** as auditors, one per round; ≥3 rounds, exit on 2 consecutive clean (1st uncounted; earliest stop round 3) before any "done"/`/clear`. Each round = new context, no memory of prior verdicts. |
+| 1 | Completion / pre-clear audit | Spawn **fresh Agent-tool subagents** as auditors, one per round; ≥3 rounds, exit on 2 consecutive clean (1st uncounted; earliest stop round 3; round-6 relief: one clean exits) before any "done"/`/clear`. Each round = new context, no memory of prior verdicts. |
 | 5 | Coherence pass per artifact | One **self-review subagent** after each spec/plan/design — drift, backward-compat, no placeholders, cross-artifact, docs-currency. |
 | 6 | Live render/verify | **Headless-browser driver scripts** under `scripts/` (CDP / Playwright). Boot the stack, drive a real turn, screenshot, query the datastore. No "looks right" without a captured artifact. |
 | 7 | Test-effectiveness audit | Subagent mutates code or asserts a known regression would be caught; "N passed" is not proof. |
-| 8 | Review gate (assistant-owned) | **Subagent-driven** artifact production + the **Workflow tool** for decomposable fan-out (judge panels, adversarial verify, loop-until-converged). Min 3 iterations, exit on 2 consecutive clean. |
+| 8 | Review gate (assistant-owned) | **Subagent-driven** artifact production + the **Workflow tool** for decomposable fan-out (judge panels, adversarial verify, loop-until-converged). Min 3 iterations, exit on 2 consecutive clean (round-6 relief). |
 | 9 | Context budget & handoff | Keep the durable handoff (`docs/NEXT-STEPS.md` cursor + auto-memory) always current so `/clear` is safe anytime. Agent has no self-meter; rely on the human + handoff currency. |
 | 10 | State-change currency | **PostToolUse hook** on `git push`/`merge` injects a reconcile reminder; agent updates front-door docs + auto-memory. |
 | 11 | Dependency / vendor review | Subagent reviews what surfaced about off-limits or vendored components; append to the project's enhancements log. |
@@ -48,6 +48,7 @@ Canonical ritual definitions: [`../../core/02-RITUALS.md`](../../core/02-RITUALS
 | 14 | Doc model & anti-drift | The funnel `BACKLOG → ROADMAP → NEXT-STEPS → PRD`; stable IDs, one canonical home per item. Enforced by the coherence pass (ritual 5). |
 | 15 | Housekeeping adjudication | Before *agent-originated* destructive cleanup — deleting a tracked file/git-ref, mutating committed config (`.gitignore`/CI/settings), reaching outside the task diff, or any action **not** undoable by one named command — spawn **one** bounded adversarial-pass **subagent**; the **orchestrator decides** from its verdict + strongest counter-argument. One pass, not a debate; if inconclusive, **escalate to the owner**, never a second round. Owner-requested chores are exempt. The bounded single pass is Principle 11 (*challenge — adversarially, and bound it*). |
 | 16 | Dependency-reality check | Before designing against an unfamiliar / fast-moving / post-cutoff dependency, **Read/Grep the installed package's source + types** (and the lockfile) to confirm real error/return semantics, export paths, and current version — not the prose docs — then pin the exact version. No special orchestration; disciplined tool-use at design time. |
+| 17 | Live eval bar (agent surfaces) | A thin **headless driver script** (real login → product streaming API → persisted fetch-back) runs ≥20 pre-registered shots on a stack spawned from the branch under test; grading = a **Workflow fan-out** (grader + adversarial skeptic per shot, tiebreak) against ground truth the agent cannot see; ≥95% to pass. |
 
 > Rituals 2 (verification-driven), 3 (proactive-but-cautious), and 4 (don't hand-curate tool-owned state) have no distinct Claude Code mechanism — they live in the `CLAUDE.md` defaults and the seed memories:
 > - Ritual 2 → `feedback_evidence_over_claims` seed memory + the "Evidence over claims" default in `CLAUDE.md.tmpl`.

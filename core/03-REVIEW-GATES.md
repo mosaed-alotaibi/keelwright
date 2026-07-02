@@ -44,17 +44,25 @@ The cadence governs when a sequence of rounds is allowed to stop.
 4. **If not converged, continue in pairs.** A FAIL resets the streak. After
    fixing, you need two clean rounds *in a row* again. A single clean round
    after a fail never exits.
+5. **Relief valve — from round 6 onward, ONE clean round exits.** If the gate
+   has not converged by the end of round 5, the exit relaxes: the next clean
+   round converges the gate, no consecutive pair required. A FAIL at round 6+
+   still demands a *subsequent* clean round — the relief never lets a round
+   that found an open blocker/major be the last word.
 
 In one line: **stop only when the floor is met AND the last two rounds are both
-clean.** A fix always resets the streak — clean rounds must be *consecutive*.
+clean — or, from round 6 onward, when any single round is clean.** While the
+pair rule is in force (rounds 1–5), a fix always resets the streak — clean
+rounds must be *consecutive*.
 
-### Why these three numbers
+### Why these numbers
 
 | Rule | Reason |
 |---|---|
 | Floor of 3 | One pass catches the obvious; the floor forces depth past the obvious. |
 | First round doesn't count | A single clean pass can be luck or fatigue. The exit demands a *repeated* clean result, after a groundwork pass has primed the work. |
 | Two consecutive | Proves the artifact is stable, not that one reviewer happened to miss things. |
+| Round-6 relief | After five genuine adversarial passes, reviewer churn — each fresh lens surfacing something different, small, and new — can deadlock an artifact that is in fact stable. One further clean pass past that point is sufficient evidence; the gate must converge, not oscillate. |
 
 ---
 
@@ -92,7 +100,7 @@ early-catch net; the heavy gate is the completion seal.
 | | **LIGHT gate** | **HEAVY gate** |
 |---|---|---|
 | **When** | Immediately after producing *each* artifact (a design, a spec, a plan), before it is surfaced or the next stage begins. | Before any "done" — sealing a plan, merging, or any context reset / hand-off. |
-| **Rounds** | **One** genuine coherence pass. | The **full cadence** (§2): min 3, exit on 2 consecutive clean. |
+| **Rounds** | **One** genuine coherence pass. | The **full cadence** (§2): min 3, exit on 2 consecutive clean (round-6 relief: §2 (rule 5)). |
 | **Scope** | Just the artifact that was just produced. | The whole change + its hand-off (docs, memory, repo state, tests). |
 | **Run by** | The author, immediately, inline. | Independent reviewers in **fresh context** (§6), one per round. |
 | **Purpose** | Catch the defect *at the artifact that introduced it*, so it never reaches the heavy gate. | Confirm readiness — by this point it should be confirmation, not discovery. |
@@ -312,7 +320,9 @@ ROUND      = one adversarial pass → FAIL (fix, reset streak) or CLEAN (+1)
 FLOOR      = min 3 rounds, always
 GROUNDWORK = the 1st round does NOT count toward exit (even if clean)
 EXIT       = floor met AND last two rounds both CLEAN (consecutive)
-NOT EXIT   = a single clean after a fail; two clean before the floor
+RELIEF     = from round 6 onward, ONE clean round exits (no pair needed;
+             a FAIL at 6+ still needs a subsequent clean round)
+NOT EXIT   = a single clean after a fail (rounds 1-5); two clean before the floor
 CLEAN      = no NEW OPEN finding — blocker/major only; minors are dispositioned
              by the agent (accept/defer/fold-in), NOT zero-findings-of-any-kind
 FIX        = itself a new change → re-verify vs live code + re-grep the funnel

@@ -33,7 +33,7 @@ the bar itself is principle #2 ("Harden, don't defer") in
 
 | # | Ritual | One-line |
 |---|--------|----------|
-| 1 | Completion ritual | Before any "done": ≥3 fresh re-audit rounds, exit on 2 consecutive clean; never claim done without a shown verification sweep. |
+| 1 | Completion ritual | Before any "done": ≥3 fresh re-audit rounds, exit on 2 consecutive clean (from round 6 onward, one clean round exits); never claim done without a shown verification sweep. |
 | 2 | Verification-driven, not test-ritual-mechanical | Tests derive from claims and verify behavior at real surfaces; don't over-test internals. |
 | 3 | Proactive-but-cautious tool use | Never ask before read-only actions; always trace effect first; always confirm before destructive/irreversible ops. |
 | 4 | Don't hand-curate tool-owned state | A tool's regenerated files aren't yours to edit; keep the durable record where you own it; ignore the tool's state dir. |
@@ -49,6 +49,7 @@ the bar itself is principle #2 ("Harden, don't defer") in
 | 14 | Documentation model & anti-drift | Funnel + stable IDs + one canonical location per item. (See `01-DOC-MODEL.md`.) |
 | 15 | Housekeeping adjudication | *Agent-originated* cleanup that deletes a tracked file/git-ref, mutates committed config, reaches outside the task's diff, or isn't undoable by one named command gets **one** fresh adversarial pass before acting; owner-requested chores are exempt; one pass then the orchestrator decides — escalate to the owner, never a second reviewer round. |
 | 16 | Dependency-reality check | Before designing against an unfamiliar / fast-moving / post-knowledge-cutoff dependency, verify its *real* behavior against the **installed package's** source/types — error & return semantics, exact export paths, which helper wraps which behavior, current CLI/version — pin the exact version, and treat a fast release cadence as a standing patch obligation. Designing from priors yields plausible-but-wrong config. |
+| 17 | Live eval bar for agent-behavioral surfaces | A surface where an LLM decides the output is verified **statistically**, never by one good turn: ≥20 live shots through the real product path, graded against ground truth the agent cannot see, ≥95% to pass, on a stack spawned from the branch under test, with a pre-registered protocol. |
 
 ---
 
@@ -70,7 +71,10 @@ handing off, resetting/clearing context, or any "we're done" milestone.
    **two most recent rounds are both clean**. The first clean round is mandatory
    groundwork and does **not** count toward the exit. A round that finds a gap is
    a *fail*: fix it, then continue — a fix **resets the streak** (the two clean
-   rounds must be consecutive). Earliest possible stop is round 3.
+   rounds must be consecutive). Earliest possible stop is round 3. **From round 6
+   onward the relief valve opens:** a single clean round exits (a FAIL at 6+
+   still needs a subsequent clean round) — see
+   [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §2 (rule 5).
 
 **A passed task/artifact gate is NOT a sealed completion.** Clearing the
 per-artifact coherence pass (Ritual 5) or a convergence cadence (Ritual 8) on the
@@ -404,7 +408,9 @@ pass**).
 - **Exit:** stop only when the **two most recent iterations are both clean** —
   and the floor of 3 is met. Earliest stop is iteration 3.
 - **Keep going in pairs of intent** if not converged: a fail always resets the
-  streak; two consecutive clean passes is always the gate.
+  streak; two consecutive clean passes is the gate through round 5.
+- **Relief valve:** from round 6 onward a single clean pass exits (a fail at 6+
+  still needs one subsequent clean) — [`03-REVIEW-GATES.md`](03-REVIEW-GATES.md) §2 (rule 5).
 
 **Each iteration is genuine, not a rubber-stamp.** Judge the artifact on
 *correct · relevant · plausible · well-specified · well-formed*, plus the Ritual 5
@@ -684,6 +690,55 @@ coherence pass re-verifies) and Ritual 2 (a probe that confirms real dependency
 behavior is the same evidence-over-priors discipline tests embody). Designing from
 priors alone yields config that is plausible but wrong — exactly the class of
 defect the early gates exist to catch before it reaches the completion ritual.
+
+---
+
+## 17. Live eval bar for agent-behavioral surfaces
+
+**Trigger:** a verification cycle whose change touches an *agent-behavioral*
+surface — anywhere an LLM decides the output: an agent's system prompt, its
+tools, the model or its middleware, or a pipeline that consumes the agent's
+answers.
+
+**The rule.** A stochastic surface is never verified by a single good turn.
+Its verification is a **live eval suite**:
+
+- **≥20 shots through the real product path** — real login, real session, real
+  streaming; the path a user takes, not a bench harness that bypasses the app.
+  Spawn the stack **from the branch under test** (kill stale listeners first —
+  never eval one build while another is serving).
+- **Graded against ground truth the agent cannot see.** Derive the answer key
+  from the data store directly (hidden labels, direct queries) — never from the
+  agent's own outputs. Ground truth over generated/synthetic data is
+  **generation-relative**: re-derive the key after every regeneration.
+- **Pass bar ≥95%** (e.g. 19/20). Below the bar the cycle FAILS its
+  verification, whatever the unit suite says.
+- **Pre-register the protocol** — shot list, grading tolerances, retry policy —
+  *before* seeing results, so failures cannot be argued away shot by shot. A
+  turn-level malfunction (transport error, empty answer) may get ONE
+  pre-registered retry; a question that fails twice fails.
+- **Grade independently and adversarially.** Graders re-derive every fact with
+  their own queries; verdicts get an adversarial verification pass (the Ritual 8
+  discipline applied to the grading itself).
+- **Record per-shot evidence for attribution** — streamed vs persisted output,
+  tool calls, event traces — so a failing score indicts the right layer (agent
+  prompt, model, middleware, or app) instead of condemning the whole stack.
+
+**Why one good turn is not evidence.** A demo turn samples the distribution
+once. A surface that passes a hand-picked end-to-end check can still fail half
+of a systematic suite; only shot *counts* expose failure **rates** and failure
+**clusters** — wrong-date grounding, fabrication after a tool error, truncated
+final turns — that single-pass verification structurally cannot see.
+
+**Distinct from Ritual 6.** Ritual 6 drives a deterministic user-facing surface
+once and inspects the actual output — sufficient when the same input yields the
+same output. This ritual exists because an LLM surface gives you a sample, not
+an answer; the unit of evidence is the suite, not the turn.
+
+**Relationship.** The eval score is part of the Ritual 1 completion sweep's
+evidence; the discipline is Ritual 2's claims-verify-behavior applied to a
+stochastic surface; the grading fan-out maps naturally onto the adapter's
+parallel-review mechanics (Ritual 8 / the gated-swarm rules).
 
 ---
 

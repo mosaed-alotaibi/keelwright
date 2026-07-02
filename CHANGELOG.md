@@ -6,6 +6,33 @@ All notable changes to Keelwright are recorded here. Format loosely follows
 
 ## [Unreleased]
 
+### Added
+
+- **`core/02-RITUALS.md` — Ritual 17: Live eval bar for agent-behavioral surfaces.**
+  A surface where an LLM decides the output is verified **statistically**, never by
+  one good turn: ≥20 live shots through the real product path, graded against ground
+  truth the agent cannot see, ≥95% to pass, on a stack spawned from the branch under
+  test, under a pre-registered protocol (tolerances + one retry per turn-level
+  malfunction), with independent + adversarially-verified grading and per-shot
+  evidence for layer attribution. Distilled from a real campaign: a surface that had
+  passed a hand-picked A-to-Z check scored 13/24 on its first systematic suite — the
+  failure *clusters* (missing date grounding, fabrication after tool errors,
+  truncated final turns) were invisible to single-pass verification. Adapter playbook
+  (headless driver + Workflow grading fan-out) in
+  `adapters/claude-code/rules/RITUALS-IN-CLAUDE-CODE.md`; glossary term *Live eval bar*.
+
+### Changed
+
+- **`core/03-REVIEW-GATES.md` §2 — the round-6 relief valve.** The cadence keeps its
+  floor (min 3 rounds) and its exit (2 consecutive clean), but from **round 6 onward a
+  single clean round converges the gate** (a FAIL at 6+ still needs one subsequent
+  clean). Rationale: after five genuine adversarial passes, reviewer churn — each
+  fresh lens finding something different, small, and new — can deadlock a stable
+  artifact; the gate must converge, not oscillate. Echoed across `02-RITUALS.md`
+  (Rituals 1 and 8), `04-LIFECYCLE.md`, `05-GLOSSARY.md` (new term *Relief valve*),
+  the README, and the claude-code adapter (README, `RITUALS-IN-CLAUDE-CODE.md`,
+  `GATED-SWARM.md` orchestrator pseudocode, seed memories).
+
 ## [0.3.0] — 2026-07-01
 
 ### Renamed
