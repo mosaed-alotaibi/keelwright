@@ -6,6 +6,8 @@ All notable changes to Keelwright are recorded here. Format loosely follows
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-07-03
+
 ### Added
 
 - **`core/02-RITUALS.md` — Ritual 17: Live eval bar for agent-behavioral surfaces.**

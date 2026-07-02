@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green.svg" alt="MIT License"></a>
-  <img src="https://img.shields.io/badge/version-0.3.0-blue.svg" alt="Version 0.3.0">
+  <img src="https://img.shields.io/badge/version-0.4.0-blue.svg" alt="Version 0.4.0">
   <img src="https://img.shields.io/badge/dependencies-bash%20only-success.svg" alt="No dependencies">
   <img src="https://img.shields.io/badge/works%20with-any%20agent%20or%20human-8957e5.svg" alt="Agent-agnostic">
 </p>
@@ -89,7 +89,7 @@ keel init        # didn't add it to PATH? use the full path: /path/to/keelwright
      | ' </ -_)/ -_) | \ \/\/ / '_| / _` | ' \ |  _|
      |_|\_\___|\___|_|  \_/\_/|_| |_\__, |_||_| \__|
                                     |___/
-  Keelwright v0.3.0 — the methodology that makes "are we done?" answerable.
+  Keelwright v0.4.0 — the methodology that makes "are we done?" answerable.
 
 Project name [my-project]: Acme API
 Project slug (identifiers, urls) [acme-api]:
