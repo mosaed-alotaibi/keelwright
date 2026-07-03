@@ -228,6 +228,41 @@ round now means K independent clean verdicts through K different lenses, not one
 reviewer's single look. Scale K to the artifact's leverage — a few for an
 ordinary gate, more at the completion seal.
 
+### Bounded delegation depth (a hard cap)
+
+Fan-out gives **breadth**; nesting gives **depth**. Breadth — K reviewers within one
+round — is unbounded by this rule (scale K to the artifact's leverage, above).
+**Depth is capped: delegated checking/verifying may nest at most FIVE levels.**
+
+Count a level each time a checking/verifying actor spawns *another* actor to check or
+verify on its behalf:
+
+- **Level 1** — the agent running the gate (the orchestrator that owns the cadence).
+- **Level 2** — a fresh independent reviewer it spawns for a round.
+- **Level 3** — a sub-reviewer that a level-2 reviewer itself spawns to check part of
+  its own verdict.
+- … up to a **hard ceiling of level 5.** An actor at level 5 does its own checking; it
+  may **not** spawn a level-6 checker.
+
+**This is a ceiling, not a target.** The standing practice
+([`00-PHILOSOPHY.md`](00-PHILOSOPHY.md) Principle 11) is unchanged: challenge in **flat
+single passes**, and when one pass is inconclusive **escalate to the owner, never to
+another robot round.** In healthy use you rarely pass level 2 — a round is one reviewer,
+or K parallel reviewers *all at the same level* (breadth, not depth). The cap exists only
+to bound a **pathology**: a verifier that keeps spawning a verifier-of-the-verifier,
+burning tokens and context while converging on nothing.
+
+**At the cap, escalate — do not descend.** If an actor at the ceiling still cannot reach
+a verdict, the answer is never a deeper level; it is to **surface the impasse to the
+owner** (the reserved-decision holder, Principle 5) with what was checked and where it
+stuck. Depth past 5 is the same anti-pattern as a robot round-2 past a bounded
+self-challenge — forbidden for the same reason.
+
+**Breadth vs depth, restated.** K parallel reviewers in one round are all *one* level of
+delegation — that is breadth and stays free. The cap counts only **nesting**: an actor
+delegating its own checking to another actor. Do not confuse a *wide* round (many
+reviewers, same level) with a *deep* stack (reviewer inside reviewer inside reviewer).
+
 ### The findings ledger
 
 A parallel, multi-round loop needs one shared artifact the bare cadence does not
@@ -329,6 +364,10 @@ FIX        = itself a new change → re-verify vs live code + re-grep the funnel
              for the corrected fact before the round counts clean
 PARALLEL   = K reviewers WITHIN a round (distinct lenses, same snapshot);
              rounds stay serial — never collapse N rounds into one fan-out
+DEPTH      = delegated checking/verifying nests AT MOST 5 levels (orchestrator = L1,
+             each spawned reviewer = next level; L5 is the ceiling). A ceiling, not a
+             target — practice stays flat single passes; at the cap ESCALATE to owner,
+             never descend. Counts NESTING only; breadth (K reviewers, same level) is free.
 LEDGER     = findings tracked open·fixed·wontfix + severity; each reviewer reports
              only NEW findings → the parallel loop converges instead of oscillating
 LIGHT GATE = 1 coherence pass per artifact, inline, by the author  → feeds →

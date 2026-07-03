@@ -6,6 +6,34 @@ All notable changes to Keelwright are recorded here. Format loosely follows
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-07-03
+
+### Added
+
+- **`core/03-REVIEW-GATES.md` §6 — Bounded delegation depth (a hard cap).** Delegated
+  checking/verifying may nest **at most 5 levels** (the agent running the gate is level 1;
+  each fresh reviewer/subagent it spawns is the next level; level 5 is the ceiling and may
+  not spawn a level-6 checker). A ceiling, not a target — the standing practice stays flat
+  single passes with escalation to the owner past a bounded pass (Principle 11); the cap
+  bounds only the pathological verifier-of-a-verifier stack. Breadth (K parallel reviewers
+  within one round, all one level) is unaffected — the cap counts *nesting*, not fan-out
+  width. Mirrored as a one-line clause in `core/00-PHILOSOPHY.md` Principle 11, a `DEPTH`
+  line in the §8 quick reference, and a glossary entry.
+- **`core/00-PHILOSOPHY.md` — Principle 12: Match the actor to the role's leverage.** The
+  lifecycle roles carry unequal stakes, so fill each with an actor whose capability fits its
+  leverage and failure-cost — strongest actor on design and verification/review; a mid-tier
+  actor where work is well-specified and mistakes are cheap and caught downstream; the
+  orchestrator sized for coordination range. Stated in **roles and capability tiers only**
+  (vendor-neutral); the concrete bindings live in the adapter/project layer, never in
+  `core/`. Glossary entry added.
+
+### Changed
+
+- **`core/00-PHILOSOPHY.md` — Principle 11** gained a depth-ceiling clause tying the
+  bounded-self-challenge principle to the new ≤5 delegation-depth cap (escalate at the
+  ceiling, never descend). No ritual text in `core/02-RITUALS.md` changed — the cap lives in
+  the review-gate engine (`core/03-REVIEW-GATES.md`).
+
 ## [0.4.0] — 2026-07-03
 
 ### Added
@@ -272,6 +300,8 @@ The first portable, generalized cut of the framework.
   filled-in Keel docs look like end to end.
 - Repo glue: `README.md`, `LICENSE` (MIT), `.gitignore`, this changelog.
 
+[0.5.0]: #050--2026-07-03
+[0.4.0]: #040--2026-07-03
 [0.3.0]: #030--2026-07-01
 [0.2.0]: #020--2026-06-30
 [0.1.0]: #010--initial-release
